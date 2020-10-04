@@ -1,28 +1,41 @@
+import warnings
 from typing import Any, Callable, Type, TYPE_CHECKING
 
-from ..config import identity
+from ..config import identical
 
 if TYPE_CHECKING:
     from ..config import BaseConfig
 
 
 class Option:
-    _preprocess: Callable[[Any, 'Option'], Any]
+    _type: Callable[[Any], Any]
     _required: bool
     _nullable: bool
     _default: Any
-    _type: Type
 
     _name: str
+    _description: str
+    _deleted_suffix: str = "__deleted"
 
-    _deleted_suffix: str = "_deleted"
-
-    def __init__(self, required=False, nullable=False, default=None, option_type=object, preprocess=identity):
+    def __init__(
+            self,
+            required=False,
+            nullable=False, default=None,
+            option_type=object,
+            type=identical,
+            preprocess=identical,
+            description=""
+    ):
         self._required = required
         self._nullable = nullable
         self._type = option_type
         self._default = default
-        self._preprocess = preprocess
+        self._description = description
+
+        if preprocess is not identical:
+            warnings.warn("preprocess has deprecated. use type to instead.", DeprecationWarning)
+            type = preprocess
+        self._type = type
 
     def __get__(self, instance: 'BaseConfig', owner):
         self._raise_if_deleted(instance)
@@ -41,9 +54,7 @@ class Option:
             if not self._nullable:
                 raise ValueError('the value should not be none')
         else:
-            value = self._preprocess(value, self)
-
-        self._raise_if_not_valid(value)
+            value = self._type(value)
 
         # remove the deleted flag if the attribute was deleted.
         if self._is_deleted(instance):
@@ -56,15 +67,7 @@ class Option:
 
     def __set_name__(self, owner, name):
         self._name = '_' + name
-
-    def _raise_if_not_valid(self, val: Any):
-        if not self._is_valid(val):
-            raise TypeError(
-                f'\'{self._name}\' type mismatch, expect {self._type.__name__} but got {val.__class__.__name__}'
-            )
-
-    def _is_valid(self, val: Any) -> bool:
-        return isinstance(val, self._type) or (self._nullable and val is None)
+        self.__name__ = name
 
     def _should_assign_default_value(self, instance):
         return not hasattr(instance, self._name) and not self._is_deleted(instance)
@@ -80,21 +83,21 @@ class Option:
             raise AttributeError(f'attribute {self._name[1:]} has been deleted')
 
     def preprocess(self, func):
-        self._preprocess = func
+        self._type = func
         return self
 
     @property
     def name(self) -> str:
-        return self._name[1:]
+        return self.__name__
 
     @property
     def type(self) -> Type:
         return self._type
 
-    @type.setter
-    def type(self, val: Type):
-        self._type = val
-
     @property
     def required(self) -> bool:
         return self._required
+
+    @property
+    def description(self) -> str:
+        return self._description

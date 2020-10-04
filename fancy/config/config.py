@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from ..config import Option
 
@@ -12,7 +12,7 @@ class BaseConfig(ABC):
     def __init__(self, loader: 'BaseConfigLoader'):
         loader.load(self)
         required_options = [
-            value for key, value in type(self).__dict__.items() if isinstance(value, Option) if value.required
+            option for _, option in self.get_all_options().items() if option.required
         ]
         for option in required_options:
             if not hasattr(self, option.name):
@@ -35,3 +35,7 @@ class BaseConfig(ABC):
 
     def post_load(self):
         pass
+
+    @classmethod
+    def get_all_options(cls) -> Dict[str, Option]:
+        return {name: option for name, option in vars(cls).items() if isinstance(option, Option)}

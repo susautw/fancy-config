@@ -1,11 +1,12 @@
 __all__ = [
     'BaseConfig', 'Option',
-    'identity', 'to_string', 'to_integer', 'to_float', 'to_bool', 'to_path', 'to_list',
+    'identical', 'to_string', 'to_integer', 'to_float', 'to_bool', 'to_path', 'to_list', 'path',
     'BaseConfigLoader', 'DictBasedConfigLoader', 'YamlConfigLoader', 'DictConfigLoader', 'PathBasedConfigLoader',
     'ConfigLoaderFactory', 'ConfigFactory'
 ]
 from .option_preprocessing import (
-    identity,
+    identical,
+    path,
     to_float,
     to_integer,
     to_string,
