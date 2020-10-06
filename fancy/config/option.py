@@ -1,6 +1,7 @@
 import warnings
 from typing import Any, Callable, Type, TYPE_CHECKING
 
+from .process import boolean, config
 from ..config import identical
 
 if TYPE_CHECKING:
@@ -16,6 +17,9 @@ class Option:
     _description: str
     _deleted_suffix: str = "__deleted"
 
+    auto_boolean_process: bool
+    auto_config_process: bool
+
     def __init__(
             self,
             required=False,
@@ -24,7 +28,9 @@ class Option:
             type=identical,
             preprocess=identical,
             description="",
-            name: str = None
+            name: str = None,
+            auto_boolean_process: bool = True,
+            auto_config_process: bool = True
     ):
         self.__name__ = name
         self._required = required
@@ -32,11 +38,13 @@ class Option:
         self._type = option_type
         self._default = default
         self._description = description
+        self.auto_boolean_process = auto_boolean_process
+        self.auto_config_process = auto_config_process
 
         if preprocess is not identical:
             warnings.warn("preprocess has deprecated. use type to instead.", DeprecationWarning)
             type = preprocess
-        self._type = type
+        self._type = self._auto_type_process(type)
 
     def __get__(self, instance: 'BaseConfig', owner):
 
@@ -68,9 +76,14 @@ class Option:
     def _should_assign_default_value(self, instance):
         return self.name not in vars(instance)
 
-    def preprocess(self, func):
-        self._type = func
-        return self
+    def _auto_type_process(self, typ: Type) -> Callable:
+        if self.auto_boolean_process and typ is bool:
+            return boolean
+        if self.auto_config_process:
+            from ..config import BaseConfig  # lazy import
+            if issubclass(typ, BaseConfig):
+                return config(typ)
+        return typ
 
     @property
     def name(self) -> str:

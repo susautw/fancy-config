@@ -28,11 +28,7 @@ def to_bool(val: Any) -> bool:
 
 
 def to_path(val: Any) -> Path:
-    warnings.warn("to_path has deprecated.use path to instead.", DeprecationWarning)
-    return path(val)
-
-
-def path(val: Any) -> Path:
+    warnings.warn("to_path has deprecated.use pathlib.Path to instead.", DeprecationWarning)
     return Path(val)
 
 
