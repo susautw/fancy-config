@@ -10,11 +10,13 @@ def flag_string(value: str) -> Any:
     :param value:
     :return:
     """
+    if not isinstance(value, str):
+        raise TypeError("the value must be a instance of str")
     if value.startswith("!"):
         type_name, real_val = value[1:].split(":", maxsplit=1)
         cls = eval(type_name)
         if type(cls) is not type:
-            raise ValueError(f"{type_name} is not a type")
+            raise TypeError(f"{type_name} is not a type")
         if cls is bool:
             return boolean(real_val)
         return cls(real_val)

@@ -47,6 +47,8 @@ class Option:
         self._type = self._auto_type_process(type)
 
     def __get__(self, instance: 'BaseConfig', owner):
+        if instance is None:
+            return self
 
         # initialize value
         if self._should_assign_default_value(instance):

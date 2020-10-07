@@ -3,7 +3,7 @@ __all__ = [
     'identical', 'to_string', 'to_integer', 'to_float', 'to_bool', 'to_path', 'to_list',
     'BaseConfigLoader', 'DictBasedConfigLoader', 'YamlConfigLoader', 'DictConfigLoader', 'PathBasedConfigLoader',
     'ConfigLoaderFactory', 'ConfigFactory',
-    'process'
+    'process', 'config_list'
 ]
 from .option_preprocessing import (
     identical,
@@ -14,7 +14,12 @@ from .option_preprocessing import (
     to_path,
     to_list
 )
+
 from . import process
+from .process import (
+    config_list
+)
+
 from .option import Option
 from .config import BaseConfig
 from .config_loaders import (
