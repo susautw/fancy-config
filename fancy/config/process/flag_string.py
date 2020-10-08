@@ -11,7 +11,7 @@ def flag_string(value: str) -> Any:
     :return:
     """
     if not isinstance(value, str):
-        raise TypeError("the value must be a instance of str")
+        return value
     if value.startswith("!"):
         type_name, real_val = value[1:].split(":", maxsplit=1)
         cls = eval(type_name)
