@@ -58,7 +58,11 @@ class BaseConfig(ABC):
         return cls._name_mapping
 
     def __repr__(self):
-        return str(vars(self))
+        return str({
+            option.name: getattr(self, option.__name__)
+            for option in self.get_all_options().values()
+            if option.is_assigned(self)
+        })
 
     def __str__(self):
         return self.__repr__()

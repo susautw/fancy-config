@@ -17,6 +17,7 @@ class Option:
     _description: str
     _deleted_suffix: str = "__deleted"
 
+    _config_name: str = None
     auto_boolean_process: bool
     auto_config_process: bool
 
@@ -32,7 +33,7 @@ class Option:
             auto_boolean_process: bool = True,
             auto_config_process: bool = True
     ):
-        self.__name__ = name
+        self._config_name = name
         self._required = required
         self._nullable = nullable
         self._type = option_type
@@ -57,7 +58,7 @@ class Option:
 
             self.__set__(instance, self._default)
 
-        return vars(instance)[self.name]
+        return vars(instance)[self.__name__]
 
     def __set__(self, instance, value):
         if value is None:
@@ -66,17 +67,21 @@ class Option:
         else:
             value = self._type(value)
 
-        vars(instance)[self.name] = value
+        vars(instance)[self.__name__] = value
 
     def __delete__(self, instance):
-        del vars(instance)[self.name]
+        del vars(instance)[self.__name__]
 
     def __set_name__(self, owner, name):
-        if self.name is None:
-            self.__name__ = name
+        self.__name__ = name
+        if self._config_name is None:
+            self._config_name = name
+
+    def is_assigned(self, instance) -> bool:
+        return self.__name__ in vars(instance)
 
     def _should_assign_default_value(self, instance):
-        return self.name not in vars(instance)
+        return not self.is_assigned(instance)
 
     def _auto_type_process(self, typ: Union[Type, Callable]) -> Callable:
         if self.auto_boolean_process and typ is bool:
@@ -90,7 +95,7 @@ class Option:
 
     @property
     def name(self) -> str:
-        return self.__name__
+        return self._config_name
 
     @property
     def type(self) -> Type:

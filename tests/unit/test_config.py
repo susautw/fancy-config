@@ -40,4 +40,5 @@ def test_config():
     }
 
     c = MyConfig(cfg.DictConfigLoader(opt))
+    print(c)
     print(vars(c))
