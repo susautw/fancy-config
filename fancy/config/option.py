@@ -84,7 +84,7 @@ class Option:
         if self.auto_config_process:
             from ..config import BaseConfig  # lazy import
 
-            if type(typ) is type and issubclass(typ, BaseConfig):
+            if isinstance(typ, type) and issubclass(typ, BaseConfig):
                 return config(typ)
         return typ
 
