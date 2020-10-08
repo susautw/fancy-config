@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Callable, Type, TYPE_CHECKING
+from typing import Any, Callable, Type, TYPE_CHECKING, Union
 
 from .process import boolean, config
 from ..config import identical
@@ -78,12 +78,13 @@ class Option:
     def _should_assign_default_value(self, instance):
         return self.name not in vars(instance)
 
-    def _auto_type_process(self, typ: Type) -> Callable:
+    def _auto_type_process(self, typ: Union[Type, Callable]) -> Callable:
         if self.auto_boolean_process and typ is bool:
             return boolean
         if self.auto_config_process:
             from ..config import BaseConfig  # lazy import
-            if issubclass(typ, BaseConfig):
+
+            if type(typ) is type and issubclass(typ, BaseConfig):
                 return config(typ)
         return typ
 
