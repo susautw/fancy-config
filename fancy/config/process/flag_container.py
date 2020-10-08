@@ -3,7 +3,7 @@ from typing import TypeVar, MutableMapping, MutableSequence
 
 from . import flag_string
 
-T = TypeVar("T", list, dict)
+T = TypeVar("T", MutableMapping, MutableSequence)
 
 
 def flag_container(container: T) -> T:
@@ -12,7 +12,7 @@ def flag_container(container: T) -> T:
     result = deepcopy(container)
     opening = [result]
 
-    while len(opening) >= 0:
+    while len(opening) > 0:
         container = opening.pop()
         for k in container:
             if isinstance(container[k], (MutableMapping, MutableSequence)):
