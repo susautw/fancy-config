@@ -16,7 +16,7 @@ class BaseConfig(ABC):
     def __init__(self, loader: 'BaseConfigLoader'):
         loader.load(self)
         for option in self.get_all_required_options():
-            if not hasattr(self, option.name):
+            if not hasattr(self, option.__name__):
                 raise ValueError(f'the missing option {option.name} is required.')
         self.post_load()
 
