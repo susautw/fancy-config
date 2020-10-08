@@ -1,6 +1,6 @@
 from argparse import Namespace
 from pathlib import Path
-from typing import Dict, TYPE_CHECKING
+from typing import Dict, TYPE_CHECKING, Union
 
 import yaml
 from abc import ABC, abstractmethod
@@ -28,6 +28,9 @@ class DictBasedConfigLoader(BaseConfigLoader):
 
 class PathBasedConfigLoader(BaseConfigLoader, ABC):
     _path: Path
+
+    def __init__(self, path: Union[Path, str]):
+        self._path = path if isinstance(path, Path) else Path(path)
 
     @property
     def path(self) -> Path:
