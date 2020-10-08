@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from ..config import BaseConfigLoader
 
 
-class BaseConfig(ABC):
+class BaseConfig(ABC):  # TODO more accurate error msg
     _name_mapping: Dict[str, str]
     _all_options: Dict[str, Option]
     _all_required_options: List[Option]

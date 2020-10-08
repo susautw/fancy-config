@@ -14,7 +14,13 @@ def flag_container(container: T) -> T:
 
     while len(opening) > 0:
         container = opening.pop()
-        for k in container:
+        keys = None
+        if isinstance(container, MutableMapping):
+            keys = container.keys()
+        else:
+            keys = range(len(container))
+
+        for k in keys:
             if isinstance(container[k], (MutableMapping, MutableSequence)):
                 opening.append(container[k])
             else:
