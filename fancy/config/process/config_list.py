@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 def config_list(
-        _type: Union[Type["BaseConfig"], Callable]) -> Callable:
+        _type: Union[Type, Callable]) -> Callable:
     from .. import DictConfigLoader, BaseConfig
 
     is_class = isinstance(type(_type), type)
