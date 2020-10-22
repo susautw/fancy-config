@@ -18,29 +18,21 @@ class Option:
     _deleted_suffix: str = "__deleted"
 
     _config_name: str = None
-    auto_boolean_process: bool
-    auto_config_process: bool
 
     def __init__(
             self,
             required=False,
             nullable=False, default=None,
-            option_type=object,
             type=identical,
             preprocess=identical,
             description="",
-            name: str = None,
-            auto_boolean_process: bool = True,
-            auto_config_process: bool = True
+            name: str = None
     ):
         self._config_name = name
         self._required = required
         self._nullable = nullable
-        self._type = option_type
         self._default = default
         self._description = description
-        self.auto_boolean_process = auto_boolean_process
-        self.auto_config_process = auto_config_process
 
         if preprocess is not identical:
             warnings.warn("preprocess has deprecated. use type to instead.", DeprecationWarning)
@@ -84,12 +76,11 @@ class Option:
         return not self.is_assigned(instance)
 
     def _auto_type_process(self, typ: Union[Type, Callable]) -> Callable:
-        if self.auto_boolean_process and typ is bool:
-            return boolean
-        if self.auto_config_process:
-            from ..config import BaseConfig  # lazy import
-
-            if isinstance(typ, type) and issubclass(typ, BaseConfig):
+        from ..config import BaseConfig  # lazy import
+        if isinstance(typ, type):
+            if issubclass(typ, bool):
+                return boolean
+            if issubclass(typ, BaseConfig):
                 return config(typ)
         return typ
 
