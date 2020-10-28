@@ -14,7 +14,6 @@ def flag_container(container: T) -> T:
 
     while len(opening) > 0:
         container = opening.pop()
-        keys = None
         if isinstance(container, MutableMapping):
             keys = container.keys()
         else:
