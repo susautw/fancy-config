@@ -88,6 +88,7 @@ class Option:
     def name(self) -> str:
         return self._config_name
 
+    # TODO remove it
     @property
     def type(self) -> Type:
         return self._type

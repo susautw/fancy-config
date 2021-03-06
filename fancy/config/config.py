@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..config import BaseConfigLoader
 
 
-class BaseConfig(ABC):  # TODO more accurate error msg
+class BaseConfig(ABC):
     _name_mapping: Dict[str, str]
     _all_options: Dict[str, Option]
     _all_required_options: List[Option]
@@ -18,22 +18,22 @@ class BaseConfig(ABC):  # TODO more accurate error msg
         loader.load(self)
         for option in self.get_all_required_options():
             if not hasattr(self, option.__name__):
-                raise ValueError(f'the missing option {option.name} is required.')
+                raise ValueError(f'{type(self)}: the missing option {option.name} is required.')
         self.post_load()
 
     def __getitem__(self, item):
         if isinstance(item, str):
-            raise TypeError(f'index must be str, not {type(item)}')
+            raise TypeError(f'{type(self)}: {item} must be str, not {type(item)}')
         try:
             return self.__getattribute__(self.get_name_mapping()[item])
         except AttributeError:
-            raise KeyError(f'not contains the config named {item}')
+            raise KeyError(f'{type(self)}: not contains the config named {item}')
 
     def __setitem__(self, key, value):
         if not isinstance(key, str):
-            raise TypeError(f'index must be str, not {type(key)}')
+            raise TypeError(f'{type(self)}: {key} must be str, not {type(key)}')
         if key not in self.get_name_mapping().keys():
-            raise KeyError(f'not contains the config named {key}')
+            raise KeyError(f'{type(self)}: not contains the config named {key}')
         key = self.get_name_mapping()[key]
         self.__setattr__(key, value)
 

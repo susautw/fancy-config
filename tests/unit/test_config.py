@@ -3,6 +3,7 @@ from typing import List
 from fancy import config as cfg
 
 
+# TODO write tests for accurate error messages
 class MyConfigEmb(cfg.BaseConfig):
     x: int = cfg.Option(type=int)
     y: int = cfg.Option(type=int)
