@@ -1,7 +1,6 @@
 import inspect
-import json
 from abc import ABC
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from ..config import Option
 
@@ -10,9 +9,9 @@ if TYPE_CHECKING:
 
 
 class BaseConfig(ABC):
-    _name_mapping: Dict[str, str]
-    _all_options: Dict[str, Option]
-    _all_required_options: List[Option]
+    _name_mapping: Optional[Dict[str, str]] = None
+    _all_options: Optional[Dict[str, Option]] = None
+    _all_required_options: Optional[List[Option]] = None
 
     def __init__(self, loader: 'BaseConfigLoader'):
         loader.load(self)
@@ -42,19 +41,19 @@ class BaseConfig(ABC):
 
     @classmethod
     def get_all_options(cls) -> Dict[str, Option]:
-        if "_all_options" not in vars(cls):
+        if cls._all_options is None:
             cls._all_options = {name: option for name, option in inspect.getmembers(cls) if isinstance(option, Option)}
         return cls._all_options
 
     @classmethod
     def get_all_required_options(cls) -> List[Option]:
-        if "_all_required_options" not in vars(cls):
+        if cls._all_required_options is None:
             cls._all_required_options = [option for option in cls.get_all_options().values() if option.required]
         return cls._all_required_options
 
     @classmethod
     def get_name_mapping(cls) -> Dict[str, str]:
-        if "_name_mapping" not in vars(cls):
+        if cls._name_mapping is None:
             cls._name_mapping = {option.name: attr_name for attr_name, option in cls.get_all_options().items()}
         return cls._name_mapping
 
