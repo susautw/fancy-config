@@ -1,25 +1,34 @@
 import inspect
-import json
 from abc import ABC
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
-from ..config import Option
+from . import ConfigStructure, ConfigContext
+from . import Option
 
 if TYPE_CHECKING:
     from ..config import BaseConfigLoader
 
 
-class BaseConfig(ABC):  # TODO more accurate error msg
+class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate error msg
     _name_mapping: Dict[str, str]
     _all_options: Dict[str, Option]
     _all_required_options: List[Option]
+    _loader: Optional['BaseConfigLoader'] = None
 
-    def __init__(self, loader: 'BaseConfigLoader'):
+    def __init__(self, loader: Optional['BaseConfigLoader'] = None):
+        if loader is not None:
+            self.load(loader)
+
+    def load(self, loader: 'BaseConfigLoader') -> None:
+        self._loader = loader
         loader.load(self)
         for option in self.get_all_required_options():
             if not hasattr(self, option.__name__):
                 raise ValueError(f'the missing option {option.name} is required.')
         self.post_load()
+
+    def load_by_context(self, context: ConfigContext, val):
+        self.load(context.get_loader().get_sub_loader(val))
 
     def __getitem__(self, item):
         if isinstance(item, str):
@@ -33,9 +42,12 @@ class BaseConfig(ABC):  # TODO more accurate error msg
         if not isinstance(key, str):
             raise TypeError(f'index must be str, not {type(key)}')
         if key not in self.get_name_mapping().keys():
-            raise KeyError(f'not contains the config named {key}')
+            raise KeyError(f'not contains the config named {key}, value: {repr(value)}')
         key = self.get_name_mapping()[key]
         self.__setattr__(key, value)
+
+    def get_loader(self) -> 'BaseConfigLoader':
+        return self._loader
 
     def post_load(self):
         pass
@@ -67,3 +79,5 @@ class BaseConfig(ABC):  # TODO more accurate error msg
 
     def __str__(self):
         return self.__repr__()
+
+

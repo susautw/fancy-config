@@ -1,10 +1,3 @@
-__all__ = [
-    'BaseConfig', 'Option',
-    'identical', 'to_string', 'to_integer', 'to_float', 'to_bool', 'to_path', 'to_list',
-    'BaseConfigLoader', 'DictBasedConfigLoader', 'YamlConfigLoader', 'DictConfigLoader', 'PathBasedConfigLoader',
-    'ConfigLoaderFactory', 'ConfigFactory',
-    'process', 'config_list'
-]
 from .option_preprocessing import (
     identical,
     to_float,
@@ -17,11 +10,15 @@ from .option_preprocessing import (
 
 from . import process
 from .process import (
-    config_list
+    config_list,
+    make_boolean
 )
 
+from .config_context import ConfigContext
+from .config_structure import ConfigStructure
 from .option import Option
-from .config import BaseConfig
+from .config_list_struct import ConfigListStructure
+from .base_config import BaseConfig
 from .config_loaders import (
     BaseConfigLoader,
     DictBasedConfigLoader,

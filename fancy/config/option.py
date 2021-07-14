@@ -1,7 +1,8 @@
 import warnings
-from typing import Any, Callable, Type, TYPE_CHECKING, Union
+from typing import Any, Callable, TYPE_CHECKING
 
-from .process import boolean, config
+from . import ConfigStructure
+from .process import auto_process_typ
 from ..config import identical
 
 if TYPE_CHECKING:
@@ -15,7 +16,6 @@ class Option:
     _default: Any
 
     _description: str
-    _deleted_suffix: str = "__deleted"
 
     _config_name: str = None
 
@@ -37,7 +37,7 @@ class Option:
         if preprocess is not identical:
             warnings.warn("preprocess has deprecated. use type to instead.", DeprecationWarning)
             type = preprocess
-        self._type = self._auto_type_process(type)
+        self._type = auto_process_typ(type)
 
     def __get__(self, instance: 'BaseConfig', owner):
         if instance is None:
@@ -52,12 +52,15 @@ class Option:
 
         return vars(instance)[self.__name__]
 
-    def __set__(self, instance, value):
-        if value is None:
+    def __set__(self, instance, raw_value):
+        if raw_value is None:
             if not self._nullable:
                 raise ValueError('the value should not be none')
-        else:
-            value = self._type(value)
+            return None
+
+        value = self._type(raw_value)
+        if isinstance(value, ConfigStructure):
+            value.load_by_context(instance, raw_value)
 
         vars(instance)[self.__name__] = value
 
@@ -75,22 +78,9 @@ class Option:
     def _should_assign_default_value(self, instance):
         return not self.is_assigned(instance)
 
-    def _auto_type_process(self, typ: Union[Type, Callable]) -> Callable:
-        from ..config import BaseConfig  # lazy import
-        if isinstance(typ, type):
-            if issubclass(typ, bool):
-                return boolean
-            if issubclass(typ, BaseConfig):
-                return config(typ)
-        return typ
-
     @property
     def name(self) -> str:
         return self._config_name
-
-    @property
-    def type(self) -> Type:
-        return self._type
 
     @property
     def required(self) -> bool:
