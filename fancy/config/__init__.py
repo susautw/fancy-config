@@ -8,6 +8,8 @@ from .option_preprocessing import (
     to_list
 )
 
+from . import attribute_setters
+
 from . import process
 from .process import (
     config_list,
