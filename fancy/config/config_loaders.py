@@ -25,6 +25,7 @@ class BaseConfigLoader(ABC):
     _attribute_setter: attribute_setters.AttributeSetter
 
     def __init__(self, setter: Union[attribute_setters.AttributeSetter, str] = None):
+        setter = "strict" if setter is None else setter
         if isinstance(setter, str):
             self._attribute_setter = setter_name_map[setter]
         else:
