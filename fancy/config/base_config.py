@@ -70,12 +70,15 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate err
             cls._name_mapping = {option.name: attr_name for attr_name, option in cls.get_all_options().items()}
         return cls._name_mapping
 
-    def __repr__(self):
-        return str({
+    def to_dict(self) -> dict:
+        return {
             option.name: getattr(self, option.__name__)
             for option in self.get_all_options().values()
             if option.is_assigned(self)
-        })
+        }
+
+    def __repr__(self):
+        return str(self.to_dict())
 
     def __str__(self):
         return self.__repr__()
