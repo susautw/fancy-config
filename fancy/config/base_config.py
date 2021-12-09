@@ -2,7 +2,7 @@ import inspect
 from abc import ABC
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from . import ConfigStructure, ConfigContext
+from . import ConfigStructure, ConfigContext, exc
 from . import Option
 
 if TYPE_CHECKING:
@@ -47,7 +47,13 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate err
         self.__setattr__(key, value)
 
     def get_loader(self) -> 'BaseConfigLoader':
+        if self._loader is None:
+            raise exc.ContextNotLoadedError(self)
         return self._loader
+
+    @property
+    def loaded(self) -> bool:
+        return self._loader is not None
 
     def post_load(self):
         pass
