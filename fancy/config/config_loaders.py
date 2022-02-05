@@ -32,7 +32,7 @@ class BaseConfigLoader(ABC):
             self._attribute_setter = setter
 
     @abstractmethod
-    def load(self, config: 'BaseConfig') -> 'BaseConfig':
+    def load(self, config: 'BaseConfig'):
         ...
 
     @abstractmethod

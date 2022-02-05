@@ -42,5 +42,5 @@ def test_config():
         "int_li": ["Y", "N"]
     }
 
-    c = MyConfig(cfg.DictConfigLoader(opt, setter="strict"))
+    c = MyConfig(cfg.DictConfigLoader(opt, setter="ignore"))
     print(c)

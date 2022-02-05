@@ -3,6 +3,7 @@ from typing import Any, Callable, TYPE_CHECKING
 
 from . import ConfigStructure
 from .process import auto_process_typ
+from .typing import UnProcType
 from ..config import identical
 
 if TYPE_CHECKING:
@@ -10,6 +11,7 @@ if TYPE_CHECKING:
 
 
 class Option:
+    raw_type: UnProcType
     _type: Callable[[Any], Any]
     _required: bool
     _nullable: bool
@@ -28,6 +30,13 @@ class Option:
             description="",
             name: str = None
     ):
+        # TODO resolve default value problem
+        #  if type is a Config or ConfigList and "Option isn't required or nullable", the
+        #  default value should assigned a empty dict or list in order to transfer control to sub configs
+        #  ---
+        #  the "transfer control" means that sub config decides what the default value
+        #  or required value or nullable values
+
         self._config_name = name
         self._required = required
         self._nullable = nullable
@@ -37,6 +46,7 @@ class Option:
         if preprocess is not identical:
             warnings.warn("preprocess has deprecated. use type to instead.", DeprecationWarning)
             type = preprocess
+        self.raw_type = type
         self._type = auto_process_typ(type)
 
     def __get__(self, instance: 'BaseConfig', owner):
@@ -53,6 +63,7 @@ class Option:
         return vars(instance)[self.__name__]
 
     def __set__(self, instance, raw_value):
+        # TODO Add Docs to explain how the None value works in this function
         if raw_value is None:
             if not self._nullable:
                 raise ValueError('the value should not be none')
@@ -82,7 +93,6 @@ class Option:
     def name(self) -> str:
         return self._config_name
 
-    # TODO remove it
     @property
     def required(self) -> bool:
         return self._required

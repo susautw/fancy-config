@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING, Callable, Type, Union
+from typing import Callable
+
+from ..typing import UnProcType
 
 
-if TYPE_CHECKING:
-    from .. import BaseConfig
-
-
-def config_list(
-        _type: Union[Type["BaseConfig"], Callable]) -> Callable:
+def config_list(_type: UnProcType) -> Callable:
     from .. import ConfigListStructure
 
     def _inner(_):

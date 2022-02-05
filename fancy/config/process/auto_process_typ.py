@@ -1,10 +1,13 @@
-from typing import Union, Type, Callable
+from typing import Callable
 
-from . import boolean, config
+from . import boolean, config, config_list
+from ..typing import UnProcType
 
 
-def auto_process_typ(typ: Union[Type, Callable]) -> Callable:
+def auto_process_typ(typ: UnProcType) -> Callable:
     from .. import BaseConfig  # lazy import
+    if isinstance(typ, list):  # https://github.com/susautw/fancy-config/issues/4
+        return config_list(typ[0])
     if isinstance(typ, type):
         if issubclass(typ, bool):
             return boolean

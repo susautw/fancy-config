@@ -2,12 +2,13 @@ from typing import Any, Callable
 
 from fancy.config import ConfigStructure, ConfigContext
 from fancy.config.process import auto_process_typ
+from fancy.config.typing import UnProcType
 
 
 class ConfigListStructure(list, ConfigStructure):
     _config_typ: Callable[[Any], Any]
 
-    def __init__(self, config_typ: Callable[[Any], Any]):
+    def __init__(self, config_typ: UnProcType):
         super().__init__()
         self._config_typ = auto_process_typ(config_typ)
 

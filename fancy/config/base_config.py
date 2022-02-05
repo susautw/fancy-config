@@ -1,9 +1,9 @@
-import inspect
 from abc import ABC
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 from . import ConfigStructure, ConfigContext, exc
 from . import Option
+from .utils import inspect
 
 if TYPE_CHECKING:
     from ..config import BaseConfigLoader
@@ -61,7 +61,10 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate err
     @classmethod
     def get_all_options(cls) -> Dict[str, Option]:
         if cls._all_options is None:
-            cls._all_options = {name: option for name, option in inspect.getmembers(cls) if isinstance(option, Option)}
+            cls._all_options = {
+                name: option
+                for name, option in inspect.getmembers(cls, lambda option: isinstance(option, Option), sort=False)
+            }
         return cls._all_options
 
     @classmethod
