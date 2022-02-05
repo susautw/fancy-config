@@ -1,4 +1,5 @@
-from typing import List
+from pprint import pprint
+from typing import List, Dict
 
 from fancy import config as cfg
 
@@ -14,10 +15,13 @@ class MyConfig(cfg.BaseConfig):
     _a: int = cfg.Option(name="a", required=True, description="hi", type=int)
     b: float = cfg.Option(required=False, type=float)
     c: bool = cfg.Option(required=True, type=bool)
-    li: List[MyConfigEmb] = cfg.Option(type=cfg.config_list(cfg.config_list(MyConfigEmb)))
+    li: List[List[MyConfigEmb]] = cfg.Option(type=[[MyConfigEmb]])
+
+    lazy_li: List[MyConfigEmb] = cfg.Lazy(lambda c: c.li[0])
+    placeholder_dict: Dict[int, MyConfigEmb] = cfg.PlaceHolder()
 
     def post_load(self):
-        print(self.a)
+        self.placeholder_dict = {self._a: self.lazy_li[0]}
 
     @property
     def a(self):
@@ -44,3 +48,5 @@ def test_config():
 
     c = MyConfig(cfg.DictConfigLoader(opt, setter="ignore"))
     print(c)
+    print(c.placeholder_dict)
+    pprint(c.to_dict(True, load_lazies=True), indent=1, depth=4)

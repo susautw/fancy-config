@@ -1,7 +1,6 @@
-import warnings
 from typing import Any, Callable, TYPE_CHECKING
 
-from . import ConfigStructure
+from . import ConfigStructure, PlaceHolder
 from .process import auto_process_typ
 from .typing import UnProcType
 from ..config import identical
@@ -10,7 +9,7 @@ if TYPE_CHECKING:
     from ..config import BaseConfig
 
 
-class Option:
+class Option(PlaceHolder):
     raw_type: UnProcType
     _type: Callable[[Any], Any]
     _required: bool
@@ -20,32 +19,29 @@ class Option:
     _description: str
 
     _config_name: str = None
+    readonly: bool = False
 
     def __init__(
             self,
-            required=False,
-            nullable=False, default=None,
-            type=identical,
-            preprocess=identical,
-            description="",
-            name: str = None
+            required: bool = False,
+            nullable: bool = False,
+            default=None,
+            type: UnProcType = identical,
+            name: str = None,
+            description: str = None
     ):
+        super().__init__(name, description)
+        self._required = required
+        self._nullable = nullable
+
         # TODO resolve default value problem
         #  if type is a Config or ConfigList and "Option isn't required or nullable", the
         #  default value should assigned a empty dict or list in order to transfer control to sub configs
         #  ---
         #  the "transfer control" means that sub config decides what the default value
         #  or required value or nullable values
-
-        self._config_name = name
-        self._required = required
-        self._nullable = nullable
         self._default = default
-        self._description = description
 
-        if preprocess is not identical:
-            warnings.warn("preprocess has deprecated. use type to instead.", DeprecationWarning)
-            type = preprocess
         self.raw_type = type
         self._type = auto_process_typ(type)
 
@@ -78,25 +74,9 @@ class Option:
     def __delete__(self, instance):
         del vars(instance)[self.__name__]
 
-    def __set_name__(self, owner, name):
-        self.__name__ = name
-        if self._config_name is None:
-            self._config_name = name
-
-    def is_assigned(self, instance) -> bool:
-        return self.__name__ in vars(instance)
-
     def _should_assign_default_value(self, instance):
         return not self.is_assigned(instance)
 
     @property
-    def name(self) -> str:
-        return self._config_name
-
-    @property
     def required(self) -> bool:
         return self._required
-
-    @property
-    def description(self) -> str:
-        return self._description
