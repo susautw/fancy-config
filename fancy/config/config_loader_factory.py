@@ -1,7 +1,7 @@
 from typing import Dict, Type
 
 from .. import config as cfg
-from fancy.config import exceptions, utils
+from fancy.config import utils, exc
 
 
 class ConfigLoaderFactory:
@@ -16,7 +16,7 @@ class ConfigLoaderFactory:
         elif method.capitalize() + cls.suffix in loaders:
             method = method.capitalize() + cls.suffix
         elif method not in loaders:
-            raise exceptions.ClassNotFoundException(method)
+            raise exc.ClassNotFoundException(method)
         return loaders[method]()
 
     @classmethod

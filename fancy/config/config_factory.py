@@ -1,7 +1,7 @@
 from typing import Dict, Type, TYPE_CHECKING
 
 from . import BaseConfig, utils
-from .exceptions import ClassNotFoundException
+from .exc import ClassNotFoundException
 
 
 if TYPE_CHECKING:

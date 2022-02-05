@@ -2,23 +2,33 @@ import inspect
 from abc import ABC
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from ..config import Option
+from . import ConfigStructure, ConfigContext, exc
+from . import Option
 
 if TYPE_CHECKING:
     from ..config import BaseConfigLoader
 
 
-class BaseConfig(ABC):
-    _name_mapping: Optional[Dict[str, str]] = None
-    _all_options: Optional[Dict[str, Option]] = None
-    _all_required_options: Optional[List[Option]] = None
+class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate error msg
+    _name_mapping: Dict[str, str] = None
+    _all_options: Dict[str, Option] = None
+    _all_required_options: List[Option] = None
+    _loader: 'BaseConfigLoader' = None
 
-    def __init__(self, loader: 'BaseConfigLoader'):
+    def __init__(self, loader: Optional['BaseConfigLoader'] = None):
+        if loader is not None:
+            self.load(loader)
+
+    def load(self, loader: 'BaseConfigLoader') -> None:
+        self._loader = loader
         loader.load(self)
         for option in self.get_all_required_options():
             if not hasattr(self, option.__name__):
                 raise ValueError(f'{type(self)}: the missing option {option.name} is required.')
         self.post_load()
+
+    def load_by_context(self, context: ConfigContext, val):
+        self.load(context.get_loader().get_sub_loader(val))
 
     def __getitem__(self, item):
         if isinstance(item, str):
@@ -32,9 +42,18 @@ class BaseConfig(ABC):
         if not isinstance(key, str):
             raise TypeError(f'{type(self)}: {key} must be str, not {type(key)}')
         if key not in self.get_name_mapping().keys():
-            raise KeyError(f'{type(self)}: not contains the config named {key}')
+            raise KeyError(f'{type(self)}: not contains the config named {key}, value: {repr(value)}')
         key = self.get_name_mapping()[key]
         self.__setattr__(key, value)
+
+    def get_loader(self) -> 'BaseConfigLoader':
+        if self._loader is None:
+            raise exc.ContextNotLoadedError(self)
+        return self._loader
+
+    @property
+    def loaded(self) -> bool:
+        return self._loader is not None
 
     def post_load(self):
         pass
@@ -57,12 +76,15 @@ class BaseConfig(ABC):
             cls._name_mapping = {option.name: attr_name for attr_name, option in cls.get_all_options().items()}
         return cls._name_mapping
 
-    def __repr__(self):
-        return str({
+    def to_dict(self) -> dict:
+        return {
             option.name: getattr(self, option.__name__)
             for option in self.get_all_options().values()
             if option.is_assigned(self)
-        })
+        }
+
+    def __repr__(self):
+        return str(self.to_dict())
 
     def __str__(self):
         return self.__repr__()

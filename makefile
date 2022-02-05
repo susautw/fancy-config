@@ -1,6 +1,3 @@
-WORKING_DIR=.
-ENV_NAME=playground
-
 all: chdir
 	python setup.py sdist bdist_wheel
 
@@ -16,7 +13,3 @@ upload_test: clean all
 
 upload: clean all
 	twine upload dist/*
-
-test: chdir
-	pwd
-	echo $PATH
