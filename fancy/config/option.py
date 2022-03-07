@@ -63,9 +63,9 @@ class Option(PlaceHolder):
         if raw_value is None:
             if not self._nullable:
                 raise ValueError('the value should not be none')
-            return None
-
-        value = self._type(raw_value)
+            value = None
+        else:
+            value = self._type(raw_value)
         if isinstance(value, ConfigStructure):
             value.load_by_context(instance, raw_value)
 
