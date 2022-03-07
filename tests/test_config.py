@@ -1,5 +1,5 @@
 from pprint import pprint
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from fancy import config as cfg
 
@@ -16,6 +16,7 @@ class MyConfig(cfg.BaseConfig):
     b: float = cfg.Option(required=False, type=float)
     c: bool = cfg.Option(required=True, type=bool)
     li: List[List[MyConfigEmb]] = cfg.Option(type=[[MyConfigEmb]])
+    n: Optional[int] = cfg.Option(type=int, required=True, nullable=True)
 
     lazy_li: List[MyConfigEmb] = cfg.Lazy(lambda c: c.li[0])
     placeholder_dict: Dict[int, MyConfigEmb] = cfg.PlaceHolder()
@@ -33,6 +34,7 @@ def test_config():
         "a": "3",
         "b": "4.2",
         "c": "true",
+        'n': None,
         "li": [[{
             "x": 1,
             "y": 2,
