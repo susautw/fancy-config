@@ -1,9 +1,10 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Dict, List, Optional, Collection
+from typing import TYPE_CHECKING, Dict, List, Optional
 
-from . import ConfigStructure, ConfigContext, exc, PlaceHolder, Lazy
+from . import ConfigStructure, ConfigContext, exc, PlaceHolder, Lazy, ConfigStructureVisitor
 from . import Option
-from .utils import inspect, non_config_struct_to_collection_recursive
+from .utils import inspect
+from . import visitors
 
 if TYPE_CHECKING:
     from ..config import BaseConfigLoader
@@ -35,7 +36,7 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate err
         self.load(context.get_loader().get_sub_loader(val))
 
     def __getitem__(self, item):
-        if isinstance(item, str):
+        if not isinstance(item, str):
             raise TypeError(f'{type(self)}: {item} must be str, not {type(item)}')
         try:
             return self.__getattribute__(self.get_name_mapping()[item])
@@ -62,27 +63,26 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate err
     def post_load(self):
         pass
 
-    def to_dict(self, recursive=True, *, load_lazies=False) -> dict:
+    def to_dict(self, recursive=True, prevent_circular=False, *, load_lazies=False) -> dict:
+        """
+        convert this config to a dictionary
+        :param recursive: If true, the method will convert structures in this config recursively.
+        :param prevent_circular: If true, the method will set the circular instance to `None` in the result.
+        :param load_lazies: If true, will load all `Lazy`s before converting.
+        :return:
+        """
         if load_lazies:
             self.load_lazies()
 
-        # noinspection PyTypeChecker
-        #  BaseConfig.to_collection must return a dictionary
-        return self.to_collection(recursive)
+        visitor = visitors.ToCollectionVisitor(recursive=recursive, set_circular_to_none=prevent_circular)
+        self.accept(visitor)
 
-    def to_collection(self, recursive: bool = True) -> Collection:
-        result = {}
-        for name, placeholder in self.get_all_placeholders().items():
-            if not placeholder.is_assigned(self):
-                continue
-            value = getattr(self, name)
-            if recursive:
-                if isinstance(value, ConfigStructure):
-                    value = value.to_collection(recursive)
-                elif isinstance(value, Collection):
-                    value = non_config_struct_to_collection_recursive(value)
-            result[placeholder.name] = value
-        return result
+        # noinspection PyTypeChecker
+        #  The visitor must return a dictionary
+        return visitor.get_result()
+
+    def accept(self, visitor: "ConfigStructureVisitor"):
+        visitor.visit_config(self)
 
     def load_lazies(self) -> None:
         for name, placeholder in self.get_all_placeholders().items():
