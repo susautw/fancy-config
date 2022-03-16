@@ -51,7 +51,7 @@ class ToCollectionVisitor(ConfigStructureVisitor):
                 self.visited[ref] = None
                 value.accept(self)
                 self.visited[ref] = self.result_stack[-1]
-            elif isinstance(value, Collection):
+            elif not isinstance(value, str) and isinstance(value, Collection):
                 self.result_stack.append(None)
                 self.visited[ref] = None
                 self._visit_collection(value)
