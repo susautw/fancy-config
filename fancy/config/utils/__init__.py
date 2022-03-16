@@ -1,2 +1,1 @@
 from . import reflections
-from .non_config_structure_to_collection import non_config_struct_to_collection_recursive
