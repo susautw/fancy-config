@@ -1,9 +1,8 @@
-from typing import Any, Callable, Collection
+from typing import Any, Callable
 
-from fancy.config import ConfigStructure, ConfigContext
-from fancy.config.process import auto_process_typ
-from fancy.config.typing import UnProcType
-from fancy.config.utils import non_config_struct_to_collection_recursive
+from . import ConfigStructure, ConfigContext, ConfigStructureVisitor
+from .process import auto_process_typ
+from .typing import UnProcType
 
 
 class ConfigListStructure(list, ConfigStructure):
@@ -22,8 +21,5 @@ class ConfigListStructure(list, ConfigStructure):
             new_items.append(cfg)
         self.extend(new_items)
 
-    def to_collection(self, recursive: bool = True) -> Collection:
-        if not recursive:
-            return self
-        # ConfigListStructure can process like a list
-        return non_config_struct_to_collection_recursive(self)
+    def accept(self, visitor: "ConfigStructureVisitor"):
+        visitor.visit_config_list(self)

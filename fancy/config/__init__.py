@@ -9,6 +9,7 @@ from .process import (
 
 from .config_context import ConfigContext
 from .config_structure import ConfigStructure
+from .config_structure_visitor import ConfigStructureVisitor
 from .placeholder import PlaceHolder
 from .lazy import Lazy
 from .option import Option

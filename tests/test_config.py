@@ -9,6 +9,7 @@ class MyConfigEmb(cfg.BaseConfig):
     x: int = cfg.Option(type=int)
     y: int = cfg.Option(type=int)
     i: bool = cfg.Option(type=bool)
+    parent: "MyConfig" = cfg.PlaceHolder()
 
 
 class MyConfig(cfg.BaseConfig):
@@ -20,6 +21,7 @@ class MyConfig(cfg.BaseConfig):
 
     lazy_li: List[MyConfigEmb] = cfg.Lazy(lambda c: c.li[0])
     placeholder_dict: Dict[int, MyConfigEmb] = cfg.PlaceHolder()
+    child: MyConfigEmb = cfg.Option(type=MyConfigEmb)
 
     def post_load(self):
         self.placeholder_dict = {self._a: self.lazy_li[0]}
@@ -45,10 +47,17 @@ def test_config():
                 "y": 3,
                 "i": "off", }
         ]],
-        "int_li": ["Y", "N"]
+        "int_li": ["Y", "N"],
+        "child": {
+            "x": 4,
+            "y": 5,
+            "i": "off",
+            "a": "ig"
+        }
     }
 
     c = MyConfig(cfg.DictConfigLoader(opt, setter="ignore"))
+    c.child.parent = c
     print(c)
     print(c.placeholder_dict)
     pprint(c.to_dict(True, load_lazies=True), indent=1, depth=4)

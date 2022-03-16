@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Collection
+from typing import TYPE_CHECKING
 
-from fancy.config import ConfigContext
+from . import ConfigContext
+
+if TYPE_CHECKING:
+    from . import ConfigStructureVisitor
 
 
 class ConfigStructure(ABC):
@@ -9,4 +12,4 @@ class ConfigStructure(ABC):
     def load_by_context(self, context: ConfigContext, val): ...
 
     @abstractmethod
-    def to_collection(self, recursive: bool = True) -> Collection: ...
+    def accept(self, visitor: "ConfigStructureVisitor"): ...
