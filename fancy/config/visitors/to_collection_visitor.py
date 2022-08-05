@@ -84,7 +84,9 @@ class HashableRef:
         self.obj = obj
 
     def __eq__(self, other: Any):
-        return self.obj == other
+        if not isinstance(other, HashableRef):
+            return False
+        return self.obj is other.obj
 
     def __hash__(self):
         return id(self.obj)
