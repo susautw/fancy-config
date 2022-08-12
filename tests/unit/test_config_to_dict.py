@@ -13,7 +13,7 @@ def test_config_to_dict_with_default_values():
         b: float = cfg.Option(default=5.1, type=float)
         sub: MySubConfig = cfg.Option(default={}, type=MySubConfig)
 
-    assert MyConfig(cfg.DictConfigLoader({'a': 1})).to_dict() == {
+    assert MyConfig(a=1).to_dict() == {
         'a': 1,
         'b': 5.1,
         'sub': {'x': True, 'y': None}
