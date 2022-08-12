@@ -1,7 +1,8 @@
 from abc import ABC
+import warnings
 from typing import Dict, List, overload, Any
 
-from . import ConfigStructure, ConfigContext, exc, PlaceHolder, Lazy, ConfigStructureVisitor, DictConfigLoader
+from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader
 from . import Option
 from .utils import inspect, Dispatcher, DispatcherError
 from . import visitors
@@ -85,17 +86,19 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     def post_load(self):
         pass
 
-    def to_dict(self, recursive=True, prevent_circular=False, *, load_lazies=False) -> dict:
+    def to_dict(self, recursive=True, prevent_circular=False, *, load_lazies=None) -> dict:
         """
         convert this config to a dictionary
         :param recursive: If true, the method will convert structures in this config recursively.
         :param prevent_circular: If true, the method will set the circular instance to `None` in the result.
-        :param load_lazies: If true, will load all `Lazy`s before converting.
+        :param load_lazies: Deprecated since 0.12.0
         :return:
         """
-        if load_lazies:
-            self.load_lazies()
-
+        if load_lazies is not None:
+            warnings.warn(
+                "the parameter 'load_lazies' is deprecated and will be removed in 1.0.0.",
+                DeprecationWarning
+            )
         visitor = visitors.ToCollectionVisitor(recursive=recursive, set_circular_to_none=prevent_circular)
         self.accept(visitor)
 
@@ -107,9 +110,11 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
         visitor.visit_config(self)
 
     def load_lazies(self) -> None:
-        for name, placeholder in self.get_all_placeholders().items():
-            if isinstance(placeholder, Lazy):
-                getattr(self, name)
+        warnings.warn(
+            "This method is deprecated and will be removed in 1.0.0."
+            "And the method has no operation",
+            DeprecationWarning
+        )
 
     def __repr__(self):
         return str(self.to_dict())
