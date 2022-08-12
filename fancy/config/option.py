@@ -28,9 +28,10 @@ class Option(PlaceHolder):
             default=None,
             type: UnProcType = identical,
             name: str = None,
-            description: str = None
+            description: str = None,
+            hidden: bool = False
     ):
-        super().__init__(name, description)
+        super().__init__(name, description, hidden)
         self._required = required
         self._nullable = nullable
 
