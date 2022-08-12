@@ -15,7 +15,7 @@ with requirements_file.open() as fp:
 
 setup(
     name="fancy-config",
-    version="0.10.5",
+    version="0.11.0",
     packages=find_namespace_packages(),
     package_data={
         # If any package contains *.txt or *.rst files, include them:
