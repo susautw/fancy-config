@@ -14,7 +14,6 @@ from .placeholder import PlaceHolder
 from .lazy import Lazy
 from .option import Option
 from .config_list_struct import ConfigListStructure
-from .base_config import BaseConfig
 from .config_loaders import (
     BaseConfigLoader,
     DictBasedConfigLoader,
@@ -22,6 +21,7 @@ from .config_loaders import (
     YamlConfigLoader,
     DictConfigLoader
 )
+from .base_config import BaseConfig
 
 
 from .config_loader_factory import ConfigLoaderFactory

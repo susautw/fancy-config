@@ -1,25 +1,47 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import Dict, List, overload, Any
 
-from . import ConfigStructure, ConfigContext, exc, PlaceHolder, Lazy, ConfigStructureVisitor
+from . import ConfigStructure, ConfigContext, exc, PlaceHolder, Lazy, ConfigStructureVisitor, DictConfigLoader
 from . import Option
-from .utils import inspect
+from .utils import inspect, Dispatcher, DispatcherError
 from . import visitors
-
-if TYPE_CHECKING:
-    from ..config import BaseConfigLoader
+from ..config import BaseConfigLoader
 
 
-class BaseConfig(ConfigStructure, ConfigContext, ABC):  # TODO more accurate error msg
+class BaseConfig(ConfigStructure, ConfigContext, ABC):
     _name_mapping: Dict[str, str] = None
     _all_placeholders: Dict[str, PlaceHolder] = None
     _all_options: Dict[str, Option] = None
     _all_required_options: List[Option] = None
-    _loader: 'BaseConfigLoader' = None
+    _loader: BaseConfigLoader = None
 
-    def __init__(self, loader: Optional['BaseConfigLoader'] = None):
+    _method_init_ = Dispatcher(is_method=True)
+
+    @overload
+    @_method_init_.register
+    def __init__(self, loader: BaseConfigLoader = None):
         if loader is not None:
+            if not isinstance(loader, BaseConfigLoader):
+                raise DispatcherError("loader should be a BaseConfigLoader")
             self.load(loader)
+
+    @overload
+    @_method_init_.register
+    def __init__(self, options: Dict[str, Any]):
+        if not isinstance(options, dict):
+            raise DispatcherError("options should be dict")
+        self.__init__(DictConfigLoader(options))
+
+    @overload
+    @_method_init_.register
+    def __init__(self, **options: Any):
+        if "loader" in options and len(options) == 1:
+            raise DispatcherError("loader should be a BaseConfigLoader")
+        self.__init__(options)
+
+    @_method_init_.implement
+    def __init__(self, *args, **kwargs):
+        ...
 
     def load(self, loader: 'BaseConfigLoader') -> None:
         self._loader = loader
