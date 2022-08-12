@@ -38,3 +38,16 @@ def test_to_dict_with_lazy_placeholder():
         'sub': {'x': 1, 'y': False},
         'sub_list': [{'x': 0, 'y': True}, {'x': 1, 'y': False}]
     }
+
+
+def test_to_dict_with_filter():
+    class MyConfig(cfg.BaseConfig):
+        a: int = cfg.Option(default=0, type=int)
+        b: float = cfg.PlaceHolder()
+
+        def post_load(self):
+            self.b = self.a * 1.2
+
+    c = MyConfig(a=1)
+    assert c.to_dict(filter=lambda p: isinstance(p, cfg.Option)) == {"a": 1}
+    assert c.to_dict(filter=lambda p: p.name != "a") == {"b": 1.2}
