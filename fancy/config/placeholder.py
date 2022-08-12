@@ -33,4 +33,7 @@ class PlaceHolder:
         return self._description
 
     def is_assigned(self, instance) -> bool:
+        """
+        :return true, if the placeholder is accessible.
+        """
         return self.__name__ in vars(instance)

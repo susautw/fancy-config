@@ -17,6 +17,9 @@ class Lazy(PlaceHolder):
         if instance is None:
             return self
 
-        if not self.is_assigned(instance):
+        if not super().is_assigned(instance):
             vars(instance)[self.__name__] = self.fn(instance)
         return vars(instance)[self.__name__]
+
+    def is_assigned(self, instance) -> bool:
+        return True
