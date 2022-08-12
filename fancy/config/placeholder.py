@@ -10,9 +10,10 @@ class PlaceHolder:
     _description: str
     readonly: bool = False
 
-    def __init__(self, name: str = None, description: str = None):
+    def __init__(self, name: str = None, description: str = None, hidden: bool = False):
         self._config_name = name
         self._description = "" if description is None else description
+        self.hidden = hidden
 
     def __set_name__(self, owner, name):
         self.__name__ = name

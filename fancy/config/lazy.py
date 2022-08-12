@@ -9,8 +9,14 @@ if TYPE_CHECKING:
 class Lazy(PlaceHolder):
     readonly: bool = True
 
-    def __init__(self, fn: Callable[['BaseConfig'], Any], name: str = None, description: str = None):
-        super().__init__(name, description)
+    def __init__(
+            self,
+            fn: Callable[['BaseConfig'], Any],
+            name: str = None,
+            description: str = None,
+            hidden: bool = False
+    ):
+        super().__init__(name, description, hidden)
         self.fn = fn
 
     def __get__(self, instance: 'BaseConfig', owner):

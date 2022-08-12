@@ -51,3 +51,21 @@ def test_to_dict_with_filter():
     c = MyConfig(a=1)
     assert c.to_dict(filter=lambda p: isinstance(p, cfg.Option)) == {"a": 1}
     assert c.to_dict(filter=lambda p: p.name != "a") == {"b": 1.2}
+
+
+def test_to_dict_with_hidden_placeholder():
+    class MyConfig(cfg.BaseConfig):
+        a: int = cfg.Option(type=int)
+        _b: int = cfg.Option(name="b", type=int, hidden=True)
+        _c: int = cfg.Lazy(lambda _c: 40, hidden=True)
+        _d: int = cfg.PlaceHolder(hidden=True)
+
+        def post_load(self):
+            self._d = 20
+
+    c = MyConfig(a=1, b=2)
+    assert c.to_dict() == {"a": 1}
+    assert c.a == 1
+    assert c._b == 2
+    assert c._c == 40
+    assert c._d == 20
