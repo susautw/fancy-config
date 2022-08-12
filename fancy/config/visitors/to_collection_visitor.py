@@ -1,7 +1,6 @@
-from typing import Collection, List, Optional, Mapping, Sequence, Any, Dict, TYPE_CHECKING
+from typing import Collection, List, Optional, Mapping, Sequence, Any, Dict, TYPE_CHECKING, Callable
 
-from .. import ConfigStructureVisitor, ConfigListStructure, ConfigStructure
-
+from .. import ConfigStructureVisitor, ConfigListStructure, ConfigStructure, PlaceHolder
 
 if TYPE_CHECKING:
     from .. import BaseConfig
@@ -12,17 +11,23 @@ class ToCollectionVisitor(ConfigStructureVisitor):
     set_circular_to_none: bool
     result_stack: List[Optional[Collection]]
     visited: Dict["HashableRef", Any]
+    _filter: Callable[[PlaceHolder], bool]
 
-    def __init__(self, recursive=True, set_circular_to_none=False):
+    # noinspection PyShadowingBuiltins
+    def __init__(self, recursive=True, set_circular_to_none=False, filter=None):
         self.recursive = recursive
         self.set_circular_to_none = set_circular_to_none
         self.result_stack = [None]
         self.visited = {}
+        self._filter = filter
 
     def visit_config(self, structure: "BaseConfig") -> None:
         result = {}
-        for placeholder in structure.get_all_placeholders().values():
-            if not placeholder.is_assigned(structure):
+        placeholders = structure.get_all_placeholders().values()
+        if self._filter is not None:
+            placeholders = filter(self._filter, placeholders)
+        for placeholder in placeholders:
+            if not placeholder.is_assigned(structure) or placeholder.hidden:
                 continue
             self._resolve_value(structure[placeholder.name])
             result[placeholder.name] = self.result_stack.pop()
