@@ -1,6 +1,6 @@
 from abc import ABC
 import warnings
-from typing import Dict, List, overload, Any
+from typing import Dict, List, overload, Any, Callable
 
 from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader
 from . import Option
@@ -86,11 +86,19 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     def post_load(self):
         pass
 
-    def to_dict(self, recursive=True, prevent_circular=False, *, load_lazies=None) -> dict:
+    # noinspection PyShadowingBuiltins
+    def to_dict(
+            self,
+            recursive=True,
+            prevent_circular=False, *,
+            load_lazies=None,
+            filter: Callable[[PlaceHolder], bool] = None
+    ) -> dict:
         """
         convert this config to a dictionary
         :param recursive: If true, the method will convert structures in this config recursively.
         :param prevent_circular: If true, the method will set the circular instance to `None` in the result.
+        :param filter: a Callable to know what placeholders should be used.
         :param load_lazies: Deprecated since 0.12.0
         :return:
         """
@@ -99,7 +107,9 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
                 "the parameter 'load_lazies' is deprecated and will be removed in 1.0.0.",
                 DeprecationWarning
             )
-        visitor = visitors.ToCollectionVisitor(recursive=recursive, set_circular_to_none=prevent_circular)
+        visitor = visitors.ToCollectionVisitor(
+            recursive=recursive, set_circular_to_none=prevent_circular, filter=filter
+        )
         self.accept(visitor)
 
         # noinspection PyTypeChecker
