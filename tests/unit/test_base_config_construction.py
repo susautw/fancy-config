@@ -1,6 +1,7 @@
 import pytest
 
 from fancy import config as cfg
+from fancy.config import exc
 from fancy.config.utils import DispatcherError
 
 
@@ -18,6 +19,10 @@ DATA = {"a": 1, "b": 2, "c": 3}
 def test_loader_construction():
     assert MyConfig(cfg.DictConfigLoader(DATA_WITH_DEFAULT)).to_dict() == RESULT_DATA_WITH_DEFAULT
     assert MyConfig(cfg.DictConfigLoader(DATA)).to_dict() == DATA
+    unloaded_config = MyConfig(loader=None)
+    assert not unloaded_config.loaded
+    with pytest.raises(exc.ContextNotLoadedError):
+        unloaded_config.get_loader()
 
 
 def test_dict_construction():
@@ -28,6 +33,15 @@ def test_dict_construction():
 def test_kwarg_construction():
     assert MyConfig(**DATA_WITH_DEFAULT).to_dict() == RESULT_DATA_WITH_DEFAULT
     assert MyConfig(**DATA).to_dict() == DATA
+
+
+def test_empty_construction():
+    class Config(cfg.BaseConfig):
+        a: int = cfg.Option(default=1, type=int)
+        b: int = cfg.Option(default=2, type=int)
+
+    assert Config().to_dict() == {'a': 1, 'b': 2}
+    assert MyConfig().to_dict() == {'c': 2}  # a and b are unload
 
 
 def test_dispatch():
