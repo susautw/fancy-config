@@ -75,8 +75,11 @@ class Option(PlaceHolder):
         del vars(instance)[self.__name__]
 
     def _should_assign_default_value(self, instance):
-        return not self.is_assigned(instance)
+        return not super().is_assigned(instance)
 
     @property
     def required(self) -> bool:
         return self._required
+
+    def is_assigned(self, instance) -> bool:
+        return super().is_assigned(instance) or self._default is not None or self._nullable
