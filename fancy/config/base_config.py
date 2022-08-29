@@ -101,7 +101,7 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
         :param prevent_circular: If true, the method will set the circular instance to ``None`` in the result.
         :param filter: a Callable to know what placeholders should be used.
         :param load_lazies: Deprecated since 0.12.0
-        :return:
+        :return: a dict
         """
         if load_lazies is not None:
             warnings.warn(
