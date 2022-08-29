@@ -96,8 +96,9 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     ) -> dict:
         """
         convert this config to a dictionary
+
         :param recursive: If true, the method will convert structures in this config recursively.
-        :param prevent_circular: If true, the method will set the circular instance to `None` in the result.
+        :param prevent_circular: If true, the method will set the circular instance to ``None`` in the result.
         :param filter: a Callable to know what placeholders should be used.
         :param load_lazies: Deprecated since 0.12.0
         :return:

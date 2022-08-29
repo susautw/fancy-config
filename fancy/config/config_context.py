@@ -10,5 +10,5 @@ class ConfigContext(ABC):
     @abstractmethod
     def get_loader(self) -> "BaseConfigLoader":
         """
-        :raises exc.ContextNotLoadedError when loader does not exist.
+        :raises exc.ContextNotLoadedError: when loader does not exist.
         """
