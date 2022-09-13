@@ -52,7 +52,7 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
 
     def _postprocessing(self) -> None:
         for option in self.get_all_required_options():
-            if not hasattr(self, option.__name__):
+            if not option.is_assigned(self):
                 raise ValueError(f'{type(self)}: the missing placeholder {option.name} is required.')
 
     def load_by_context(self, context: ConfigContext, val):
