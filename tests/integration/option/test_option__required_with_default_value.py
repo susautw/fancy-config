@@ -20,5 +20,4 @@ class MyConfig(cfg.BaseConfig):
 def test_required_option_with_default_value_behavior(attr_name, config, expected_config):
     c = MyConfig(config)
     assert attr_name not in vars(c)
-    for k, v in expected_config.items():
-        assert c[k] == v
+    assert c.to_dict() == expected_config
