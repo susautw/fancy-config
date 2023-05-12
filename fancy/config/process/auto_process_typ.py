@@ -13,7 +13,7 @@ def auto_process_typ(typ: UnProcType) -> Callable:
             return boolean
         if issubclass(typ, BaseConfig):
             return config(typ)
-    if isinstance(typ, Callable):
+    if callable(typ):
         return typ
     else:
-        raise ValueError("_type must be Callable or subclass of BaseConfig")
+        raise ValueError("typ must be callable or subclass of BaseConfig")

@@ -1,7 +1,7 @@
 from typing import Any, Callable, TYPE_CHECKING
 
-from . import ConfigStructure, PlaceHolder
-from .process import auto_process_typ
+from . import PlaceHolder
+from .process import auto_process_typ, auto_process_value
 from .typing import UnProcType
 from ..config import identical
 
@@ -66,9 +66,7 @@ class Option(PlaceHolder):
                 raise ValueError('the value should not be none')
             value = None
         else:
-            value = self._type(raw_value)
-        if isinstance(value, ConfigStructure):
-            value.load_by_context(instance, raw_value)
+            value = auto_process_value(raw_value, self._type, instance)
 
         vars(instance)[self.__name__] = value
 
