@@ -52,7 +52,7 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
 
     def _postprocessing(self) -> None:
         for option in self.get_all_required_options():
-            if not hasattr(self, option.__name__):
+            if not option.is_assigned(self):
                 raise ValueError(f'{type(self)}: the missing placeholder {option.name} is required.')
 
     def load_by_context(self, context: ConfigContext, val):
@@ -96,11 +96,12 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     ) -> dict:
         """
         convert this config to a dictionary
+
         :param recursive: If true, the method will convert structures in this config recursively.
-        :param prevent_circular: If true, the method will set the circular instance to `None` in the result.
+        :param prevent_circular: If true, the method will set the circular instance to ``None`` in the result.
         :param filter: a Callable to know what placeholders should be used.
         :param load_lazies: Deprecated since 0.12.0
-        :return:
+        :return: a dict
         """
         if load_lazies is not None:
             warnings.warn(
