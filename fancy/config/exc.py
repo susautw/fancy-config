@@ -5,3 +5,9 @@ class ClassNotFoundException(Exception):
 
 class ContextNotLoadedError(RuntimeError):
     pass
+
+
+class DuplicatedNameError(RuntimeError):
+    """
+    Detects a config class has duplicated name in its placeholders.
+    """

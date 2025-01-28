@@ -1,8 +1,8 @@
 from abc import ABC
 import warnings
-from typing import Dict, List, overload, Any, Callable
+from typing import Dict, List, overload, Any, Callable, Optional
 
-from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader
+from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader, consts
 from . import Option
 from .utils import inspect, Dispatcher, DispatcherError
 from . import visitors
@@ -10,10 +10,10 @@ from ..config import BaseConfigLoader
 
 
 class BaseConfig(ConfigStructure, ConfigContext, ABC):
-    _name_mapping: Dict[str, str] = None
-    _all_placeholders: Dict[str, PlaceHolder] = None
-    _all_options: Dict[str, Option] = None
-    _all_required_options: List[Option] = None
+    _name_mapping: Optional[Dict[str, str]] = None
+    _all_placeholders: Optional[Dict[str, PlaceHolder]] = None
+    _all_options: Optional[Dict[str, Option]] = None
+    _all_required_options: Optional[List[Option]] = None
     _loader: BaseConfigLoader = None
 
     _method_init_ = Dispatcher(is_method=True)
@@ -43,6 +43,12 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     @_method_init_.implement
     def __init__(self, *args, **kwargs):
         ...
+
+    def __init_subclass__(cls, **kwargs):
+        cls._name_mapping = None
+        cls._all_placeholders = None
+        cls._all_options = None
+        cls._all_required_options = None
 
     def load(self, loader: 'BaseConfigLoader') -> None:
         self._loader = loader
@@ -127,6 +133,10 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
             DeprecationWarning
         )
 
+    def clear(self) -> None:
+        for placeholder in self.get_all_placeholders().values():
+            placeholder.__delete__(self)
+
     def __repr__(self):
         return str(self.to_dict())
 
@@ -162,8 +172,12 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     @classmethod
     def get_name_mapping(cls) -> Dict[str, str]:
         if cls._name_mapping is None:
-            cls._name_mapping = {
-                placeholder.name: attr_name
-                for attr_name, placeholder in cls.get_all_placeholders().items()
-            }
+            name_mapping = {}
+            for attr_name, placeholder in cls.get_all_placeholders().items():
+                if placeholder.name == consts.IGNORED_NAME:
+                    continue
+                if placeholder.name in name_mapping:
+                    raise exc.DuplicatedNameError()
+                name_mapping[placeholder.name] = attr_name
+            cls._name_mapping = name_mapping
         return cls._name_mapping

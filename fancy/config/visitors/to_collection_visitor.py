@@ -1,6 +1,6 @@
 from typing import Collection, List, Optional, Mapping, Sequence, Any, Dict, TYPE_CHECKING, Callable
 
-from .. import ConfigStructureVisitor, ConfigListStructure, ConfigStructure, PlaceHolder
+from .. import ConfigStructureVisitor, ConfigListStructure, ConfigStructure, PlaceHolder, consts
 
 if TYPE_CHECKING:
     from .. import BaseConfig
@@ -27,7 +27,9 @@ class ToCollectionVisitor(ConfigStructureVisitor):
         if self._filter is not None:
             placeholders = filter(self._filter, placeholders)
         for placeholder in placeholders:
-            if not placeholder.is_assigned(structure) or placeholder.hidden:
+            if not placeholder.is_assigned(structure) or \
+                    placeholder.hidden or \
+                    placeholder.name == consts.IGNORED_NAME:
                 continue
             self._resolve_value(structure[placeholder.name])
             result[placeholder.name] = self.result_stack.pop()
