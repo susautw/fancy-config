@@ -2,7 +2,7 @@ from abc import ABC
 import warnings
 from typing import Dict, List, overload, Any, Callable, Optional
 
-from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader
+from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader, consts
 from . import Option
 from .utils import inspect, Dispatcher, DispatcherError
 from . import visitors
@@ -172,8 +172,12 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     @classmethod
     def get_name_mapping(cls) -> Dict[str, str]:
         if cls._name_mapping is None:
-            cls._name_mapping = {
-                placeholder.name: attr_name
-                for attr_name, placeholder in cls.get_all_placeholders().items()
-            }
+            name_mapping = {}
+            for attr_name, placeholder in cls.get_all_placeholders().items():
+                if placeholder.name == consts.IGNORED_NAME:
+                    continue
+                if placeholder.name in name_mapping:
+                    raise exc.DuplicatedNameError()
+                name_mapping[placeholder.name] = attr_name
+            cls._name_mapping = name_mapping
         return cls._name_mapping
