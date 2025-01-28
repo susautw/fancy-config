@@ -1,6 +1,6 @@
 from abc import ABC
 import warnings
-from typing import Dict, List, overload, Any, Callable
+from typing import Dict, List, overload, Any, Callable, Optional
 
 from . import ConfigStructure, ConfigContext, exc, PlaceHolder, ConfigStructureVisitor, DictConfigLoader
 from . import Option
@@ -10,10 +10,10 @@ from ..config import BaseConfigLoader
 
 
 class BaseConfig(ConfigStructure, ConfigContext, ABC):
-    _name_mapping: Dict[str, str] = None
-    _all_placeholders: Dict[str, PlaceHolder] = None
-    _all_options: Dict[str, Option] = None
-    _all_required_options: List[Option] = None
+    _name_mapping: Optional[Dict[str, str]] = None
+    _all_placeholders: Optional[Dict[str, PlaceHolder]] = None
+    _all_options: Optional[Dict[str, Option]] = None
+    _all_required_options: Optional[List[Option]] = None
     _loader: BaseConfigLoader = None
 
     _method_init_ = Dispatcher(is_method=True)
@@ -43,6 +43,12 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     @_method_init_.implement
     def __init__(self, *args, **kwargs):
         ...
+
+    def __init_subclass__(cls, **kwargs):
+        cls._name_mapping = None
+        cls._all_placeholders = None
+        cls._all_options = None
+        cls._all_required_options = None
 
     def load(self, loader: 'BaseConfigLoader') -> None:
         self._loader = loader
