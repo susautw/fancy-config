@@ -133,6 +133,10 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
             DeprecationWarning
         )
 
+    def clear(self) -> None:
+        for placeholder in self.get_all_placeholders().values():
+            placeholder.__delete__(self)
+
     def __repr__(self):
         return str(self.to_dict())
 

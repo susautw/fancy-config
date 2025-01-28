@@ -53,7 +53,8 @@ class Option(PlaceHolder):
         # initialize value
         if self._should_assign_default_value(instance):
             if self._default is None and not self._nullable:
-                raise AttributeError("attribute must assign the value before access it.")
+                raise AttributeError(
+                    f"attribute '{self.__name__}' of '{owner.__name__}' object must be assigned before accessing.")
 
             self.__set__(instance, self._default)
 

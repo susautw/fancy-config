@@ -12,6 +12,7 @@ def test_required_option():
         MyConfig({})
     c = MyConfig(x=1)  # y is not required, this statement shouldn't raise exceptions
     assert c.x == 1
-    with pytest.raises(AttributeError, match="attribute must assign the value before access it."):
+    with pytest.raises(AttributeError,
+                       match="attribute 'y' of 'MyConfig' object must be assigned before accessing."):
         # noinspection PyStatementEffect
         c.y

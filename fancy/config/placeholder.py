@@ -20,10 +20,24 @@ class PlaceHolder:
         if self._config_name is None:
             self._config_name = name
 
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        try:
+            return vars(instance)[self.__name__]
+        except KeyError:
+            raise AttributeError(
+                f"attribute '{self.__name__}' of '{owner.__name__}' object must be assigned before accessing."
+            )
+
     def __set__(self, instance: 'BaseConfig', raw_value):
         if self.readonly:
             raise AttributeError(f"{self.name} can't be set")
         vars(instance)[self.__name__] = raw_value
+
+    def __delete__(self, instance: 'BaseConfig'):
+        vars(instance).pop(self.__name__, None)
 
     @property
     def name(self) -> str:
