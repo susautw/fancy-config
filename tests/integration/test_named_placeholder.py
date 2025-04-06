@@ -16,8 +16,8 @@ def test_det_duplicated_placeholder_name():
 def test_ignored_name():
     class MyConfig(cfg.BaseConfig):
         # This is only for assigning, it can never be loaded
-        a: int = cfg.Option(name=cfg.IGNORED_NAME, type=int)
-        b: int = cfg.Option(type=int)
+        a = cfg.Option(name=cfg.IGNORED_NAME, type=int)
+        b = cfg.Option(type=int)
 
     c = MyConfig(b=2)
     assert c.b == 2
@@ -32,8 +32,8 @@ def test_ignored_name():
 def test_ignored_name_cannot_be_loaded():
     class MyConfig(cfg.BaseConfig):
         # This is only for assigning, it can never be loaded
-        a: int = cfg.Option(name=cfg.IGNORED_NAME, type=int)
-        b: int = cfg.Option(type=int)
+        a = cfg.Option(name=cfg.IGNORED_NAME, type=int)
+        b = cfg.Option(type=int)
 
     with pytest.raises(KeyError, match=r'not contains the config named a, value: 1'):
         MyConfig(a=1, b=2)
@@ -41,8 +41,8 @@ def test_ignored_name_cannot_be_loaded():
 
 def test_ignore_name_and_to_dict():
     class MyConfig(cfg.BaseConfig):
-        a: int = cfg.Option(type=int)
-        b: str = cfg.Lazy(lambda c: f'n{c.a}', name=cfg.IGNORED_NAME)
+        a = cfg.Option(type=int)
+        b = cfg.Lazy(lambda c: f'n{c.a}', name=cfg.IGNORED_NAME)
 
     data = {'a': 1}
     c = MyConfig(data)

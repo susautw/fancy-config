@@ -2,15 +2,15 @@ from fancy import config as cfg
 
 
 class SubConfig(cfg.BaseConfig):
-    a: int = cfg.Option(type=int)
+    a = cfg.Option(type=int)
 
 
 class MyConfig(cfg.BaseConfig):
-    sub: SubConfig = cfg.Option(type=SubConfig)
+    sub = cfg.Option(type=SubConfig)
 
 
 class MyListConfig(cfg.BaseConfig):
-    subs: list = cfg.Option(type=[SubConfig])
+    subs = cfg.Option(type=[SubConfig])
 
 
 def test_option__assigning_config_instance():

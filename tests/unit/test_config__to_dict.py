@@ -1,17 +1,15 @@
-from typing import Optional, List
-
 from fancy import config as cfg
 
 
 def test_config_to_dict_with_default_values():
     class MySubConfig(cfg.BaseConfig):
-        x: bool = cfg.Option(default=True, type=bool)
-        y: Optional[float] = cfg.Option(nullable=True, type=float)
+        x = cfg.Option(default=True, type=bool)
+        y = cfg.Option(nullable=True, type=float)
 
     class MyConfig(cfg.BaseConfig):
-        a: int = cfg.Option(type=int)
-        b: float = cfg.Option(default=5.1, type=float)
-        sub: MySubConfig = cfg.Option(default={}, type=MySubConfig)
+        a = cfg.Option(type=int)
+        b = cfg.Option(default=5.1, type=float)
+        sub = cfg.Option(default={}, type=MySubConfig)
 
     assert MyConfig(a=1).to_dict() == {
         'a': 1,
@@ -22,14 +20,14 @@ def test_config_to_dict_with_default_values():
 
 def test_to_dict_with_lazy_placeholder():
     class SubConfig(cfg.BaseConfig):
-        x: int = cfg.Option(type=int)
-        y: bool = cfg.Lazy(lambda c: c.x == 0)
+        x = cfg.Option(type=int)
+        y = cfg.Lazy(lambda c: c.x == 0)
 
     class MyConfig(cfg.BaseConfig):
-        a: int = cfg.Option(type=int)
-        b: float = cfg.Lazy(lambda c: c.a / 2)
-        sub: SubConfig = cfg.Option(default={}, type=SubConfig)
-        sub_list: List[SubConfig] = cfg.Option(default=[], type=[SubConfig])
+        a = cfg.Option(type=int)
+        b = cfg.Lazy(lambda c: c.a / 2)
+        sub = cfg.Option(default={}, type=SubConfig)
+        sub_list = cfg.Option(default=[], type=[SubConfig])
 
     assert MyConfig(
         a=1, sub=dict(x=1), sub_list=[dict(x=0), dict(x=1)]
@@ -42,8 +40,8 @@ def test_to_dict_with_lazy_placeholder():
 
 def test_to_dict_with_filter():
     class MyConfig(cfg.BaseConfig):
-        a: int = cfg.Option(default=0, type=int)
-        b: float = cfg.PlaceHolder()
+        a = cfg.Option(default=0, type=int)
+        b = cfg.PlaceHolder()
 
         def post_load(self):
             self.b = self.a * 1.2
@@ -55,10 +53,10 @@ def test_to_dict_with_filter():
 
 def test_to_dict_with_hidden_placeholder():
     class MyConfig(cfg.BaseConfig):
-        a: int = cfg.Option(type=int)
-        _b: int = cfg.Option(name="b", type=int, hidden=True)
-        _c: int = cfg.Lazy(lambda _c: 40, hidden=True)
-        _d: int = cfg.PlaceHolder(hidden=True)
+        a = cfg.Option(type=int)
+        _b = cfg.Option(name="b", type=int, hidden=True)
+        _c = cfg.Lazy(lambda _c: 40, hidden=True)
+        _d = cfg.PlaceHolder[int, int](hidden=True)
 
         def post_load(self):
             self._d = 20

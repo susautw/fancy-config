@@ -1,25 +1,33 @@
-from typing import TYPE_CHECKING, Callable, Any
+from typing import TYPE_CHECKING, Callable, Any, Generic, Optional, TypeVar, overload
 
-from . import PlaceHolder
+from .placeholder import PlaceHolder
 
 if TYPE_CHECKING:
     from . import BaseConfig
 
+GV = TypeVar("GV")
 
-class Lazy(PlaceHolder):
+# TODO: typing using new syntax. use Never instead of Any
+class Lazy(Generic[GV], PlaceHolder[GV, Any]):
     readonly: bool = True
 
     def __init__(
-            self,
-            fn: Callable[['BaseConfig'], Any],
-            name: str = None,
-            description: str = None,
-            hidden: bool = False
+        self,
+        fn: Callable[["BaseConfig"], Any],
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        hidden: bool = False,
     ):
         super().__init__(name, description, hidden)
         self.fn = fn
 
-    def __get__(self, instance: 'BaseConfig', owner):
+    @overload
+    def __get__(self, instance: "BaseConfig", owner) -> GV:
+        ...
+    @overload
+    def __get__(self, instance: None, owner) -> "Lazy":  # TODO: Self
+        ...
+    def __get__(self, instance: Optional["BaseConfig"], owner):
         if instance is None:
             return self
 
