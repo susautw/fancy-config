@@ -5,16 +5,18 @@ from .. import ConfigStructureVisitor, ConfigListStructure, ConfigStructure, Pla
 if TYPE_CHECKING:
     from .. import BaseConfig
 
+FilterFn = Callable[[PlaceHolder], bool]
+
 
 class ToCollectionVisitor(ConfigStructureVisitor):
     recursive: bool
     set_circular_to_none: bool
     result_stack: List[Optional[Collection]]
     visited: Dict["HashableRef", Any]
-    _filter: Callable[[PlaceHolder], bool]
+    _filter: Optional[FilterFn]
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, recursive=True, set_circular_to_none=False, filter=None):
+    def __init__(self, recursive=True, set_circular_to_none=False, filter: Optional[FilterFn] = None):
         self.recursive = recursive
         self.set_circular_to_none = set_circular_to_none
         self.result_stack = [None]
@@ -43,7 +45,8 @@ class ToCollectionVisitor(ConfigStructureVisitor):
         self.result_stack[-1] = result
 
     def get_result(self) -> Collection:
-        assert len(self.result_stack) == 1
+        assert len(self.result_stack) == 1 and self.result_stack[0] is not None, \
+            "Visitor is not finished yet or result is empty"
         return self.result_stack[0]
 
     def _resolve_value(self, value) -> None:
@@ -80,7 +83,9 @@ class ToCollectionVisitor(ConfigStructureVisitor):
             return
         for key, value in entries:
             self._resolve_value(value)
-            result[key] = self.result_stack.pop()
+
+            # TODO: use return value instead of pop in _resolve_value
+            result[key] = self.result_stack.pop() # type: ignore
         self.result_stack[-1] = result
 
 

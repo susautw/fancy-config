@@ -1,16 +1,25 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic, Optional, TypeVar, Union, overload
 
 if TYPE_CHECKING:
     from fancy.config import BaseConfig
 
+GV = TypeVar("GV")
+SV = TypeVar("SV")
+
 
 # https://github.com/susautw/fancy-config/issues/3
-class PlaceHolder:
-    _config_name: str
+class PlaceHolder(Generic[GV, SV]):
+    _config_name: Optional[str]
     _description: str
+    hidden: bool
     readonly: bool = False
 
-    def __init__(self, name: str = None, description: str = None, hidden: bool = False):
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        hidden: bool = False,
+    ):
         self._config_name = name
         self._description = "" if description is None else description
         self.hidden = hidden
@@ -20,7 +29,14 @@ class PlaceHolder:
         if self._config_name is None:
             self._config_name = name
 
-    def __get__(self, instance, owner):
+    # TODO: typing using new syntax
+    @overload
+    def __get__(self, instance: "BaseConfig", owner) -> GV:
+        ...
+    @overload
+    def __get__(self, instance: None, owner) -> "PlaceHolder":
+        ...
+    def __get__(self, instance: Optional["BaseConfig"], owner) -> Union[GV, "PlaceHolder"]:
         if instance is None:
             return self
 
@@ -31,16 +47,19 @@ class PlaceHolder:
                 f"attribute '{self.__name__}' of '{owner.__name__}' object must be assigned before accessing."
             )
 
-    def __set__(self, instance: 'BaseConfig', raw_value):
+    def __set__(self, instance: "BaseConfig", raw_value: SV):
         if self.readonly:
             raise AttributeError(f"{self.name} can't be set")
         vars(instance)[self.__name__] = raw_value
 
-    def __delete__(self, instance: 'BaseConfig'):
+    def __delete__(self, instance: "BaseConfig"):
         vars(instance).pop(self.__name__, None)
 
     @property
     def name(self) -> str:
+        assert self._config_name is not None, (
+            "placeholder does not attached to any config"
+        )
         return self._config_name
 
     @property

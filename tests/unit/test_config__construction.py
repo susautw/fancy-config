@@ -6,9 +6,9 @@ from fancy.config.utils import DispatcherError
 
 
 class MyConfig(cfg.BaseConfig):
-    a: int = cfg.Option(type=int)
-    b: float = cfg.Option(type=float)
-    c: int = cfg.Option(default=2, type=int)
+    a = cfg.Option(type=int)
+    b = cfg.Option(type=float)
+    c = cfg.Option(default=2, type=int)
 
 
 DATA_WITH_DEFAULT = {"a": 1, "b": 2}
@@ -37,8 +37,8 @@ def test_kwarg_construction():
 
 def test_empty_construction():
     class Config(cfg.BaseConfig):
-        a: int = cfg.Option(default=1, type=int)
-        b: int = cfg.Option(default=2, type=int)
+        a = cfg.Option(default=1, type=int)
+        b = cfg.Option(default=2, type=int)
 
     assert Config().to_dict() == {'a': 1, 'b': 2}
     assert MyConfig().to_dict() == {'c': 2}  # a and b are unload
@@ -49,6 +49,6 @@ def test_dispatch():
         MyConfig(loader=1)
     with pytest.raises(DispatcherError):
         # noinspection PyTypeChecker
-        MyConfig(1)
+        MyConfig(1) # type: ignore
     with pytest.raises(DispatcherError):
-        MyConfig(1, a=1, b=2)
+        MyConfig(1, a=1, b=2) # type: ignore

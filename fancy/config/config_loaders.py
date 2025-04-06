@@ -1,6 +1,6 @@
 from argparse import Namespace
 from pathlib import Path
-from typing import Dict, TYPE_CHECKING, Union
+from typing import Dict, TYPE_CHECKING, Optional, Union
 
 import yaml
 from abc import ABC, abstractmethod
@@ -21,10 +21,13 @@ for name, x in vars(attribute_setters).items():
             pass
 
 
+SetterName = Union[str, attribute_setters.AttributeSetter]
+
+
 class BaseConfigLoader(ABC):
     _attribute_setter: attribute_setters.AttributeSetter
 
-    def __init__(self, setter: Union[attribute_setters.AttributeSetter, str] = None):
+    def __init__(self, setter: Optional[SetterName] = None):
         setter = "strict" if setter is None else setter
         if isinstance(setter, str):
             self._attribute_setter = setter_name_map[setter]
@@ -32,12 +35,10 @@ class BaseConfigLoader(ABC):
             self._attribute_setter = setter
 
     @abstractmethod
-    def load(self, config: 'BaseConfig'):
-        ...
+    def load(self, config: "BaseConfig"): ...
 
     @abstractmethod
-    def get_sub_loader(self, val) -> "BaseConfigLoader":
-        ...
+    def get_sub_loader(self, val) -> "BaseConfigLoader": ...
 
     def get_setter(self) -> attribute_setters.AttributeSetter:
         return self._attribute_setter
@@ -48,7 +49,7 @@ class DictBasedConfigLoader(BaseConfigLoader, ABC):
     def get_dict(self) -> Dict:
         pass
 
-    def load(self, config: 'BaseConfig'):
+    def load(self, config: "BaseConfig"):
         for key, value in self.get_dict().items():
             self.get_setter().set(config, key, value)
 
@@ -59,7 +60,11 @@ class DictBasedConfigLoader(BaseConfigLoader, ABC):
 class PathBasedConfigLoader(BaseConfigLoader, ABC):
     _path: Path
 
-    def __init__(self, path: Union[Path, str], setter: Union[attribute_setters.AttributeSetter, str] = None):
+    def __init__(
+        self,
+        path: Union[Path, str],
+        setter: Optional[SetterName] = None,
+    ):
         super().__init__(setter)
         self._path = path if isinstance(path, Path) else Path(path)
 
@@ -73,7 +78,6 @@ class PathBasedConfigLoader(BaseConfigLoader, ABC):
 
 
 class YamlConfigLoader(DictBasedConfigLoader, PathBasedConfigLoader):
-
     def get_dict(self) -> Dict:
         if not self.path.is_file():
             raise FileNotFoundError(str(self.path))
@@ -90,7 +94,7 @@ class YamlConfigLoader(DictBasedConfigLoader, PathBasedConfigLoader):
 class DictConfigLoader(DictBasedConfigLoader):
     _dict: Dict
 
-    def __init__(self, _dict: Dict, setter: Union[attribute_setters.AttributeSetter, str] = None):
+    def __init__(self, _dict: Dict, setter: Optional[SetterName] = None):
         super().__init__(setter)
         self._dict = _dict
 
@@ -101,7 +105,11 @@ class DictConfigLoader(DictBasedConfigLoader):
 class NamespaceConfigLoader(DictBasedConfigLoader):
     _args: Namespace
 
-    def __init__(self, args: Namespace, setter: Union[attribute_setters.AttributeSetter, str] = None):
+    def __init__(
+        self,
+        args: Namespace,
+        setter: Optional[SetterName] = None,
+    ):
         super().__init__(setter)
         self._args = args
 

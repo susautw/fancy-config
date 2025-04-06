@@ -3,10 +3,10 @@ from fancy import config as cfg
 
 def test_inherit_with_named_options():
     class SuperConfig(cfg.BaseConfig):
-        a: str = cfg.Option(name="A")
+        a = cfg.Option(name="A")
 
     class SubConfig(SuperConfig):
-        b: str = cfg.Option(name="B")
+        b = cfg.Option(name="B")
 
     super_data = {"A": '1'}
     sc = SuperConfig(super_data)

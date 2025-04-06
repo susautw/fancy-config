@@ -1,8 +1,7 @@
 import types
-from inspect import *
+from inspect import getmro, isclass
 
 
-# noinspection PyShadowingBuiltins
 def getmembers(object, predicate=None, *, sort=True):
     """Return all members of an object as (name, value) pairs sorted by name.
     Optionally, only return members that satisfy a given predicate."""
@@ -12,7 +11,7 @@ def getmembers(object, predicate=None, *, sort=True):
         mro = ()
     results = []
     processed = set()
-    names = dir(object) if sort else ordered_dir(object)
+    names = list(dir(object) if sort else ordered_dir(object))
     # :dd any DynamicClassAttributes to the list of names if object is a class;
     # this may result in duplicate entries if, for example, a virtual
     # attribute with the same name as a DynamicClassAttribute exists

@@ -1,27 +1,26 @@
 from pprint import pprint
-from typing import List, Dict, Optional
 
 from fancy import config as cfg
 
 
 # TODO write tests for accurate error messages
 class MyConfigEmb(cfg.BaseConfig):
-    x: int = cfg.Option(type=int)
-    y: int = cfg.Option(type=int)
-    i: bool = cfg.Option(type=bool)
-    parent: "MyConfig" = cfg.PlaceHolder()
+    x = cfg.Option(type=int)
+    y = cfg.Option(type=int)
+    i = cfg.Option(type=bool)
+    parent = cfg.PlaceHolder["MyConfig", "MyConfig"]()
 
 
 class MyConfig(cfg.BaseConfig):
-    _a: int = cfg.Option(name="a", required=True, description="hi", type=int)
-    b: float = cfg.Option(required=False, type=float)
-    c: bool = cfg.Option(required=True, type=bool)
-    li: List[List[MyConfigEmb]] = cfg.Option(type=[[MyConfigEmb]])
-    n: Optional[int] = cfg.Option(type=int, required=True, nullable=True)
+    _a = cfg.Option(name="a", required=True, description="hi", type=int)
+    b = cfg.Option(required=False, type=float)
+    c = cfg.Option(required=True, type=bool)
+    li = cfg.Option(type=[[MyConfigEmb]])
+    n = cfg.Option(type=int, required=True, nullable=True)
 
-    lazy_li: List[MyConfigEmb] = cfg.Lazy(lambda c: c.li[0])
-    placeholder_dict: Dict[int, MyConfigEmb] = cfg.PlaceHolder()
-    child: MyConfigEmb = cfg.Option(type=MyConfigEmb)
+    lazy_li = cfg.Lazy(lambda c: c.li[0])
+    placeholder_dict = cfg.PlaceHolder()
+    child = cfg.Option(type=MyConfigEmb)
 
     def post_load(self):
         self.placeholder_dict = {self._a: self.lazy_li[0]}

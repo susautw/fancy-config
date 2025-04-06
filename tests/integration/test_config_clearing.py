@@ -1,15 +1,13 @@
-from typing import List
-
 import pytest
 
 from fancy import config as cfg
 
 
 class MyConfig(cfg.BaseConfig):
-    a: int = cfg.Option(type=int, required=True)
-    b: str = cfg.Option(type=str, default="default text")
-    c: List[int] = cfg.Option(type=[int])
-    d: str = cfg.PlaceHolder()  # custom state marked with Placeholder
+    a = cfg.Option(type=int, required=True)
+    b = cfg.Option(type=str, default="default text")
+    c = cfg.Option(type=[int])
+    d: cfg.PlaceHolder[str, str] = cfg.PlaceHolder()  # custom state marked with Placeholder
     e: int  # a custom state marking
 
     def post_load(self):
