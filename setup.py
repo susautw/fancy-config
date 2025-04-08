@@ -2,7 +2,7 @@ from pathlib import Path
 
 from setuptools import setup, find_namespace_packages
 
-package_dir = Path("./fancy/config")
+package_dir = Path(__file__).parent
 readme_file = package_dir / "README.md"
 requirements_file = package_dir.parent.parent / "requirements.txt"
 
