@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Any, Generic, Optional, TypeVar, overload
+from typing import TYPE_CHECKING, Callable, Any, Generic, NoReturn, Optional, TypeVar, overload
 
 from .placeholder import PlaceHolder
 
@@ -8,12 +8,12 @@ if TYPE_CHECKING:
 GV = TypeVar("GV")
 
 # TODO: typing using new syntax. use Never instead of Any
-class Lazy(Generic[GV], PlaceHolder[GV, Any]):
+class Lazy(Generic[GV], PlaceHolder[GV]):
     readonly: bool = True
 
     def __init__(
         self,
-        fn: Callable[["BaseConfig"], Any],
+        fn: Callable[[Any], GV],
         name: Optional[str] = None,
         description: Optional[str] = None,
         hidden: bool = False,

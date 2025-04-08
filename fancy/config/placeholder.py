@@ -1,14 +1,14 @@
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union, overload
 
 if TYPE_CHECKING:
     from fancy.config import BaseConfig
 
-GV = TypeVar("GV")
-SV = TypeVar("SV")
+V = TypeVar("V")
+
 
 
 # https://github.com/susautw/fancy-config/issues/3
-class PlaceHolder(Generic[GV, SV]):
+class PlaceHolder(Generic[V]):
     _config_name: Optional[str]
     _description: str
     hidden: bool
@@ -31,12 +31,12 @@ class PlaceHolder(Generic[GV, SV]):
 
     # TODO: typing using new syntax
     @overload
-    def __get__(self, instance: "BaseConfig", owner) -> GV:
+    def __get__(self, instance: "BaseConfig", owner) -> V:
         ...
     @overload
     def __get__(self, instance: None, owner) -> "PlaceHolder":
         ...
-    def __get__(self, instance: Optional["BaseConfig"], owner) -> Union[GV, "PlaceHolder"]:
+    def __get__(self, instance: Optional["BaseConfig"], owner) -> Union[V, "PlaceHolder"]:
         if instance is None:
             return self
 
@@ -47,7 +47,7 @@ class PlaceHolder(Generic[GV, SV]):
                 f"attribute '{self.__name__}' of '{owner.__name__}' object must be assigned before accessing."
             )
 
-    def __set__(self, instance: "BaseConfig", raw_value: SV):
+    def __set__(self, instance: "BaseConfig", raw_value: Any):
         if self.readonly:
             raise AttributeError(f"{self.name} can't be set")
         vars(instance)[self.__name__] = raw_value

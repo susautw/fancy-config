@@ -21,11 +21,11 @@ def test_config_to_dict_with_default_values():
 def test_to_dict_with_lazy_placeholder():
     class SubConfig(cfg.BaseConfig):
         x = cfg.Option(type=int)
-        y = cfg.Lazy(lambda c: c.x == 0)
+        y = cfg.Lazy[bool](lambda c: c.x == 0)
 
     class MyConfig(cfg.BaseConfig):
         a = cfg.Option(type=int)
-        b = cfg.Lazy(lambda c: c.a / 2)
+        b = cfg.Lazy[float](lambda c: c.a / 2)
         sub = cfg.Option(default={}, type=SubConfig)
         sub_list = cfg.Option(default=[], type=[SubConfig])
 
@@ -41,7 +41,7 @@ def test_to_dict_with_lazy_placeholder():
 def test_to_dict_with_filter():
     class MyConfig(cfg.BaseConfig):
         a = cfg.Option(default=0, type=int)
-        b = cfg.PlaceHolder()
+        b = cfg.PlaceHolder[float]()
 
         def post_load(self):
             self.b = self.a * 1.2
@@ -55,8 +55,8 @@ def test_to_dict_with_hidden_placeholder():
     class MyConfig(cfg.BaseConfig):
         a = cfg.Option(type=int)
         _b = cfg.Option(name="b", type=int, hidden=True)
-        _c = cfg.Lazy(lambda _c: 40, hidden=True)
-        _d = cfg.PlaceHolder[int, int](hidden=True)
+        _c = cfg.Lazy[int](lambda _c: 40, hidden=True)
+        _d = cfg.PlaceHolder[int](hidden=True)
 
         def post_load(self):
             self._d = 20
