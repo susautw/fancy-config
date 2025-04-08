@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 
 GV = TypeVar("GV")
 SV = TypeVar("SV")
-N = TypeVar("N")
+N = TypeVar("N")  # TODO: should bound to None or Never
 
-class Option(Generic[GV, SV, N], PlaceHolder[Union[GV, N], Union[SV, N]]):
+class Option(Generic[GV, SV, N], PlaceHolder[Union[GV, N]]):
     raw_type: UnProcType
     _type: Callable[[Any], Any]
     _required: bool
@@ -69,7 +69,7 @@ class Option(Generic[GV, SV, N], PlaceHolder[Union[GV, N], Union[SV, N]]):
 
         return vars(instance)[self.__name__]
 
-    def __set__(self, instance: "BaseConfig", raw_value: Union[SV, None]):
+    def __set__(self, instance: "BaseConfig", raw_value: Optional[Union[SV, N]]):
         # TODO Add Docs to explain how the None value works in this function
         if raw_value is None:
             if not self._nullable:

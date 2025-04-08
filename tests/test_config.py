@@ -8,7 +8,7 @@ class MyConfigEmb(cfg.BaseConfig):
     x = cfg.Option(type=int)
     y = cfg.Option(type=int)
     i = cfg.Option(type=bool)
-    parent = cfg.PlaceHolder["MyConfig", "MyConfig"]()
+    parent = cfg.PlaceHolder["MyConfig"]()
 
 
 class MyConfig(cfg.BaseConfig):

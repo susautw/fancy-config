@@ -7,7 +7,7 @@ class MyConfig(cfg.BaseConfig):
     a = cfg.Option(type=int, required=True)
     b = cfg.Option(type=str, default="default text")
     c = cfg.Option(type=[int])
-    d: cfg.PlaceHolder[str, str] = cfg.PlaceHolder()  # custom state marked with Placeholder
+    d: cfg.PlaceHolder[str] = cfg.PlaceHolder()  # custom state marked with Placeholder
     e: int  # a custom state marking
 
     def post_load(self):
