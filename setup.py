@@ -15,11 +15,11 @@ with requirements_file.open() as fp:
 
 setup(
     name="fancy-config",
-    version="0.13.2",
-    packages=find_namespace_packages(),
+    version="0.13.3",
+    packages=find_namespace_packages("src"),
+    package_dir={"": "src"},
     package_data={
-        # If any package contains *.txt or *.rst files, include them:
-        "": ["*.md", "*.txt"],
+        "": ["*.md", "*.txt", "*.pyi"],
     },
 
     # metadata to display on PyPI
