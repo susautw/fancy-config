@@ -65,8 +65,9 @@ class Lazy[GV](PlaceHolder[GV]):
     ) -> None: ...
     def __set__(self, instance: BaseConfig, raw_value: Any) -> NoReturn: ...
 
-type _Nested[SV, GV] = list[_Nested[SV, GV]] | list[Callable[[SV], GV]]
-type _NestedValue[V] = Sequence[_NestedValue[V]] | V
+#! Only for single-layer nesting; typing for more complex nesting is not supported.
+type _Nested[SV, GV] = list[Callable[[SV], GV]]
+type _NestedValue[V] = list[V]
 type Never = NoReturn  # TODO: use real Never type when available
 
 class Option[GV, SV, N](PlaceHolder[GV | N]):
