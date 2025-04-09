@@ -1,6 +1,7 @@
 import pytest
 from pathlib import Path
 from fancy import config as cfg
+import sys
 
 
 def path_converter(value):
@@ -27,6 +28,23 @@ def test_custom_converter_with_invalid_input():
     # For the path converter, most inputs will work, but we can test with something unusual
     with pytest.raises(TypeError):  # Replace with specific exception if known
         FileConfig({"location": 123})  # Integer isn't directly convertible to Path
+
+# Test for staticmethod converter (Python 3.10+)
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="Requires Python 3.10 or higher")
+def test_staticmethod_converter():
+    class StaticMethodFileConfig(cfg.BaseConfig):
+        @staticmethod
+        def path_converter(value):
+            return Path(value)
+        
+        location = cfg.Option(type=path_converter)
+    """Test the staticmethod converter case shown in the README"""
+    # Test with a string path
+    config = StaticMethodFileConfig({"location": "/tmp/file.txt"})
+    
+    # Verify the conversion worked
+    assert isinstance(config.location, Path)
+    assert str(config.location) == "/tmp/file.txt"
 
 # Custom converter for duration in seconds
 def duration_converter(value):

@@ -170,6 +170,27 @@ config = FileConfig({"location": "/tmp/file.txt"})
 print(type(config.location))  # <class 'pathlib.Path'>
 ```
 
+### Special Case: Custom Type Conversion with Static Methods
+
+Starting with Python 3.10, `staticmethod` objects are callable, allowing you to define custom type converters directly within the configuration class. This approach is useful when the custom converter is specific to the configuration and does not need to be reused elsewhere.
+
+```python
+from fancy import config as cfg
+from pathlib import Path
+
+class FileConfig(cfg.BaseConfig):
+  @staticmethod
+  def path_converter(value):
+    return Path(value)
+  
+  location = cfg.Option(type=path_converter)
+
+config = FileConfig({"location": "/tmp/file.txt"})
+print(type(config.location))  # <class 'pathlib.Path'>
+```
+
+This method keeps the custom converter encapsulated within the configuration class, improving code organization and readability.
+
 ### Lazy Computed Values
 
 ```python
