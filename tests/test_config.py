@@ -59,4 +59,4 @@ def test_config():
     c.child.parent = c
     print(c)
     print(c.placeholder_dict)
-    pprint(c.to_dict(True, load_lazies=True), indent=1, depth=4)
+    pprint(c.to_dict(True), indent=1, depth=4)
