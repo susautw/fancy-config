@@ -13,3 +13,6 @@ upload_test: clean all
 
 upload: clean all
 	twine upload dist/*
+
+test:
+	PYTHONPATH=src pytest tests 
