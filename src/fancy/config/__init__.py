@@ -1,3 +1,17 @@
+"""
+Fancy Config - A flexible configuration management system for Python applications.
+
+This package provides a robust framework for defining, loading, and managing configuration
+structures in Python. It supports various sources of configuration data, type conversion,
+validation, and hierarchical configuration structures.
+
+Key components:
+- BaseConfig: Base class for creating configuration classes
+- Option: For defining configuration options with validation and type conversion
+- PlaceHolder and Lazy: For defining computed or placeholder values
+- ConfigLoaders: For loading configuration from different sources
+"""
+
 __all__ = [
     "attribute_setters",
     "process",

@@ -5,10 +5,21 @@ from . import boolean
 
 def flag_string(value: str) -> Any:
     """
-    any_string => skip
-    !type_name:real_value => type_cls(value)
-    :param value:
-    :return:
+    Process a string value that may contain type information.
+    
+    This function allows type conversion from string representations using a special
+    syntax. If the string starts with '!', it is parsed as a type conversion request.
+    
+    Format: !type_name:real_value
+    
+    Examples:
+      - "regular string" -> unchanged
+      - "!int:42" -> 42 (as int)
+      - "!bool:true" -> True (using boolean converter)
+    
+    :param value: The value to process
+    :return: The original value if not a flagged string, otherwise the converted value
+    :raises TypeError: If the specified type name is not a valid type
     """
     if not isinstance(value, str):
         return value
