@@ -83,3 +83,38 @@ def test_to_dict_with_list():
     assert config_dict["servers"][0]["port"] == 8080
     assert config_dict["servers"][1]["host"] == "server2.example.com"
     assert config_dict["servers"][1]["port"] == 80
+
+
+class NullableServerConfig(cfg.BaseConfig):
+        host = cfg.Option(type=str, required=True)
+        port = cfg.Option(type=int, default=80)
+        tags = cfg.Option(type=[str], default=["server"], nullable=True)  # Nullable list of strings
+
+def test_nullable_list_elements():
+    # Test with nullable list elements
+
+    config = NullableServerConfig({
+        "host": "server1.example.com",
+        "tags": None  # Explicitly set to None
+    })
+    
+    assert config.tags is None  # Should be None
+
+def test_nullable_list_elements_without_value():
+    # Test with nullable list elements without explicitly setting them
+    config = NullableServerConfig({
+        "host": "server1.example.com"
+    })
+
+    assert config.tags is not None  # Should not be None    
+    assert config.tags == ["server"]  # Should use default value
+
+    config.tags.append("web")
+
+    another_config = NullableServerConfig({
+        "host": "server2.example.com"
+    })
+
+    assert another_config.tags is not None  # Should not be None
+    # Check the default value does not change
+    assert another_config.tags == ["server"]  # Should use default value

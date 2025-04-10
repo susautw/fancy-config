@@ -113,7 +113,7 @@ class Option[GV, SV, N](PlaceHolder[GV | N]):
         *,
         required: bool = False,
         nullable: Literal[True],
-        default: _SV | None = None,
+        default: Sequence[_SV] | None = None,
         type: _Nested[_SV, _GV],
         name: str | None = None,
         description: str | None = None,
