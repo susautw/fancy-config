@@ -9,10 +9,10 @@ clean:
 	rm -rf ./dist
 
 upload_test: clean all
-	twine upload --repository testpypi dist/*
+	twine upload --repository testpypi dist/*.whl
 
 upload: clean all
-	twine upload dist/*
+	twine upload dist/*.whl
 
 test:
 	PYTHONPATH=src pytest tests 

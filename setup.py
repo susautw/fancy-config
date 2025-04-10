@@ -15,7 +15,7 @@ with requirements_file.open() as fp:
 
 setup(
     name="fancy-config",
-    version="0.13.3",
+    version="0.13.4",
     packages=find_namespace_packages("src"),
     package_dir={"": "src"},
     package_data={
