@@ -4,7 +4,7 @@ from setuptools import setup, find_namespace_packages
 
 package_dir = Path(__file__).parent
 readme_file = package_dir / "README.md"
-requirements_file = package_dir.parent.parent / "requirements.txt"
+requirements_file = package_dir / "requirements.txt"
 
 with readme_file.open() as fp:
     long_description = fp.read()
@@ -15,13 +15,12 @@ with requirements_file.open() as fp:
 
 setup(
     name="fancy-config",
-    version="0.13.4",
+    version="0.13.5",
     packages=find_namespace_packages("src"),
     package_dir={"": "src"},
     package_data={
         "": ["*.md", "*.txt", "*.pyi"],
     },
-
     # metadata to display on PyPI
     author="su-rin",
     author_email="susautw@gmail.com",
@@ -32,12 +31,12 @@ setup(
         "Source Code": "https://github.com/susautw/fancy-config",
     },
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
-    install_requires=requirements
+    python_requires=">=3.6",
+    install_requires=requirements,
 )
