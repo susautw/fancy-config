@@ -91,6 +91,7 @@ class BaseConfig(ConfigStructure, ConfigContext, ABC):
     def __init__(self, *args, **kwargs): ...
 
     def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
         cls._name_mapping = None
         cls._all_placeholders = None
         cls._all_options = None
